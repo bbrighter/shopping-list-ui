@@ -1,7 +1,7 @@
-import { atom } from "jotai"
-import { client } from "../api/api"
-import type { entity } from "../api/generatedApi"
-import { productsAtom } from "./products"
+import { atom } from 'jotai'
+import { client } from '../api/api'
+import type { entity } from '../api/generatedApi'
+import { productsAtom } from './products'
 
 type Item = {
     id: number
@@ -40,6 +40,6 @@ export const listWithProducts = atom((get) => {
     const products = get(productsAtom)
     return list.map(it => ({
         ...it,
-        productName: products.find(p => p.id == it.productId)?.name
+        productName: products.find(p => p.id == it.productId)?.name,
     }))
 })

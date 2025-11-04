@@ -7,13 +7,24 @@
     "start": "vite --open",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "lint:fix": "eslint . --fix && tsc",
+    "preview": "vite preview",
+    "knip": "knip",
+    "dependencies:ci": "npx depcruise src  --include-only \"^src\"",
+    "dependencies:table": "npx depcruise src  --include-only \"^src\" --output-type html > graph.html",
+    "dependencies:graph": "npx depcruise --include-only \"^src\" --output-type dot src | dot -T svg > graph.svg"
   },
   "dependencies": {
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.1",
+    "@mui/material": "^7.3.4",
     "@reduxjs/toolkit": "^2.9.2",
+    "dependency-cruiser": "^17.2.0",
     "jotai": "^2.15.0",
+    "knip": "^5.67.1",
     "react": "^19.1.1",
-    "react-dom": "^19.1.1"
+    "react-dom": "^19.1.1",
+    "wouter": "^3.7.1"
   },
   "devDependencies": {
     "@eslint/js": "^9.36.0",

@@ -19,5 +19,13 @@ export default defineConfig([
       ecmaVersion: 2020,
       globals: globals.browser,
     },
+    rules: {
+      'quotes': ['error', 'single'],
+      'comma-dangle': ['error', 'always-multiline'],
+      'object-curly-spacing': ['error', 'always'],
+      'no-console': 'warn',
+      'react/react-in-jsx-scope': 'off',
+      'react-hooks/exhaustive-deps': 'off',
+    }
   },
 ])

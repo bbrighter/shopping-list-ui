@@ -1,5 +1,5 @@
-import { atom } from "jotai"
-import { client } from "../api/api"
+import { atom } from 'jotai'
+import { client } from '../api/api'
 
 type Product = {
     id: number

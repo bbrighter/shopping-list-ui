@@ -55,6 +55,10 @@ export const client: PiidInjectedClient<typeof baseClient.shoppinglist> = new Pr
 
         return (...args: any[]) => {
             const piid = getPiid?.()
+            if (!piid) {
+                console.error('No piid: ', piid)
+                return
+            }
             return orig.call(target, piid, ...args)
         }
     },
