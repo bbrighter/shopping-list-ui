@@ -9,7 +9,7 @@ const storage = {
     removeItem: (key: string) => { window.localStorage.removeItem(key) },
 
 }
-const tokenAtom = atomWithStorage('token', '', storage)
+export const tokenAtom = atomWithStorage('token', '', storage)
 
 
 export const postLoginAtom = atom(null, async (_get, set, { password, userName }: { password: string, userName: string }): Promise<boolean> => {
@@ -30,7 +30,6 @@ export const getPermissionsAtom = atom(null, async (get, set) => {
         const resp = await authApi.GetPermissions()
         const piid = resp.instances.find(v => v.appMapping['shopping-list'])?.piid || ''
         set(piidAtom, piid)
-        console.log('setting piid to ', piid)
         set(authProblemAtom, false)
     }
 })
