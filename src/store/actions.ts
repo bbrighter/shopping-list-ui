@@ -1,9 +1,9 @@
 import { atom } from 'jotai'
-import { itemsAtom, listIdAtom, listIsLoadedAtom } from './atoms'
-import { respToItem, respToList, type Item } from './types'
-import { client } from '../../api/api'
-import { productsAtom, type Product } from '../products'
+import { itemsAtom, listIdAtom, listIsLoadedAtom, productIsLoadedAtom, productsAtom } from './atoms'
+import { client } from '../api/api'
+import { type Product } from './types'
 import { itemAtom } from './selectors'
+import { respToItem, respToList, type Item } from './types'
 
 export const fetchListAtom = atom(null, async (get, set) => {
     if (get(listIsLoadedAtom)) return
@@ -62,4 +62,21 @@ export const deleteItemAtom = atom(null, async (get, set, id: number) => {
     await client.DeleteItem(id)
     const newItems = get(itemsAtom).filter(it => it.id != id)
     set(itemsAtom, newItems)
-}) 
+})
+
+
+const getProducts = async (): Promise<Product[]> => {
+    const resp = await client.ListProducts()
+    return resp.products.map(p => ({
+        id: p.id,
+        name: p.name,
+    }))
+}
+
+
+export const fetchProducts = atom(null, async (get, set) => {
+    if (get(productIsLoadedAtom)) return
+    const products = await getProducts()
+    set(productsAtom, products)
+    set(productIsLoadedAtom, true)
+})

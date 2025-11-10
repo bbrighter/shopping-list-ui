@@ -1,6 +1,6 @@
 import Button from '@mui/material/Button';
 import ButtonGroup from '@mui/material/ButtonGroup';
-import { deleteItemAtom, updateItemAtom, type Item } from '../../../store/items';
+import { deleteItemAtom, updateItemAtom, type Item } from '../../../store';
 import { useSetAtom } from 'jotai';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { useState } from 'react';

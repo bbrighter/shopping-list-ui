@@ -1,6 +1,6 @@
 import { useAtomValue, useSetAtom } from 'jotai'
 import { useEffect } from 'react'
-import { fetchListAtom, itemsWithNamesAtom } from '../../store/items'
+import { fetchListAtom, fetchProducts, itemsWithNamesAtom } from '../../store'
 import List from '@mui/material/List'
 import ListItem from '@mui/material/ListItem'
 import ListItemText from '@mui/material/ListItemText'
@@ -8,7 +8,6 @@ import { piidAtom } from '../../store/auth'
 import Container from '@mui/material/Container'
 import ItemInput from './components/ItemInput'
 import ItemSecondaryAction from './components/ItemSecondaryAction'
-import { fetchProducts } from '../../store/products'
 import ItemCheckBox from './components/ItemCheckBox'
 
 export default function Home() {

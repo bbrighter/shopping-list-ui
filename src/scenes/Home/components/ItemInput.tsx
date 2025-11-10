@@ -1,9 +1,8 @@
 import Autocomplete from '@mui/material/Autocomplete';
 import TextField from '@mui/material/TextField';
 import { useAtomValue, useSetAtom } from 'jotai';
-import { productsNotInUseAtom } from '../../../store/products';
 import { useEffect, useState } from 'react';
-import { postItemAtom } from '../../../store/items';
+import { postItemAtom, productsNotInUseAtom } from '../../../store';
 
 type Option = {
     id?: number

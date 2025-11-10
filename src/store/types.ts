@@ -1,4 +1,4 @@
-import type { entity } from '../../api/generatedApi'
+import type { entity } from '../api/generatedApi'
 
 export type Item = {
     id: number
@@ -22,3 +22,8 @@ type List = { id: number, items: Array<Item> }
 export const respToList = (resp: entity.ListResponse): List => (
     { id: resp.id, items: resp.items.map(it => respToItem(it)) }
 )
+
+export type Product = {
+    id: number
+    name: string
+}
