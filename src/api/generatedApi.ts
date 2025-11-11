@@ -151,6 +151,10 @@ export namespace authentication {
 }
 
 export namespace shoppinglist {
+    export interface DeleteListForceDeleteParam {
+        Force: boolean
+    }
+
     export interface ItemNameParams {
         name: string
     }
@@ -161,6 +165,7 @@ export namespace shoppinglist {
         constructor(baseClient: BaseClient) {
             this.baseClient = baseClient
             this.CheckItem = this.CheckItem.bind(this)
+            this.DeleteItem = this.DeleteItem.bind(this)
             this.DeleteList = this.DeleteList.bind(this)
             this.GetOrCreateList = this.GetOrCreateList.bind(this)
             this.ListProducts = this.ListProducts.bind(this)
@@ -172,8 +177,17 @@ export namespace shoppinglist {
             await this.baseClient.callTypedAPI("PATCH", `/piid/${encodeURIComponent(piid)}/item/${encodeURIComponent(itemId)}/check`)
         }
 
-        public async DeleteList(piid: string, listId: number): Promise<void> {
-            await this.baseClient.callTypedAPI("DELETE", `/piid/${encodeURIComponent(piid)}/list/${encodeURIComponent(listId)}`)
+        public async DeleteItem(piid: string, itemId: number): Promise<void> {
+            await this.baseClient.callTypedAPI("DELETE", `/piid/${encodeURIComponent(piid)}/item/${encodeURIComponent(itemId)}`)
+        }
+
+        public async DeleteList(piid: string, listId: number, params: DeleteListForceDeleteParam): Promise<void> {
+            // Convert our params into the objects we need for the request
+            const query = makeRecord<string, string | string[]>({
+                force: String(params.Force),
+            })
+
+            await this.baseClient.callTypedAPI("DELETE", `/piid/${encodeURIComponent(piid)}/list/${encodeURIComponent(listId)}`, undefined, {query})
         }
 
         public async GetOrCreateList(piid: string): Promise<entity.ListResponse> {
@@ -221,7 +235,7 @@ export namespace entity {
         productId: number
         listId: number
         checked: boolean
-        quantity: number
+        quantity?: number
     }
 
     export interface ListResponse {

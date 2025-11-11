@@ -1,5 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { navigate } from 'wouter/use-browser-location';
 import Client, { Environment, Local, type ClientOptions } from './generatedApi';
+
 
 
 const getStageURL = (): string => {
@@ -18,8 +20,16 @@ const baseUrl = import.meta.env.MODE === 'test'
         : Local
 
 
+const fetcher = async (input: RequestInfo | URL, init?: RequestInit) => {
+    const resp = await fetch(input, init)
+    if (resp.status == 401) {
+        navigate('/login')
+    }
+    return resp
+}
+
 const options: ClientOptions = {
-    fetcher: (input: RequestInfo | URL, init?: RequestInit) => fetch(input, { ...init }),
+    fetcher: fetcher,
     auth: () => ({ Token: window.localStorage.getItem('token') || '' }),
 }
 
@@ -56,7 +66,6 @@ export const client: PiidInjectedClient<typeof baseClient.shoppinglist> = new Pr
         return (...args: any[]) => {
             const piid = getPiid?.()
             if (!piid) {
-                console.error('No piid: ', piid)
                 return
             }
             return orig.call(target, piid, ...args)
