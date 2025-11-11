@@ -5,6 +5,7 @@ import { afterAll, afterEach, beforeAll, beforeEach, expect } from 'vitest';
 import { handlers } from './handler';
 import { getDefaultStore } from 'jotai';
 import { piidAtom } from '../store/auth';
+import { listIsLoadedAtom, productIsLoadedAtom } from '../store';
 
 
 expect.extend(matchers);
@@ -20,8 +21,10 @@ beforeAll(() => {
     // })
 })
 beforeEach(() => {
-    getDefaultStore().set(piidAtom, '1234')
-
+    const store = getDefaultStore()
+    store.set(piidAtom, '1234')
+    store.set(listIsLoadedAtom, false)
+    store.set(productIsLoadedAtom, false)
 })
 afterEach(() => {
     server.resetHandlers()

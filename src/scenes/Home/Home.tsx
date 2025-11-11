@@ -9,6 +9,8 @@ import Container from '@mui/material/Container'
 import ItemInput from './components/ItemInput'
 import ItemSecondaryAction from './components/ItemSecondaryAction'
 import ItemCheckBox from './components/ItemCheckBox'
+import FinishListButton from './components/FinishListButton'
+import Stack from '@mui/material/Stack'
 
 export default function Home() {
     const piid = useAtomValue(piidAtom)
@@ -24,18 +26,21 @@ export default function Home() {
 
     return (
         <Container sx={{ padding: '2rem' }}>
-            <ItemInput />
-            <List >
-                {items.map(it => (
-                    <ListItem
-                        key={it.id}
-                        secondaryAction={<ItemSecondaryAction item={it} />}
-                    >
-                        <ItemCheckBox item={it} />
-                        <ListItemText primary={it.productName || 'no name'} secondary={it.quantity} />
-                    </ListItem>
-                ))}
-            </List>
+            <Stack spacing={3}>
+                <FinishListButton />
+                <ItemInput />
+                <List >
+                    {items.map(it => (
+                        <ListItem
+                            key={it.id}
+                            secondaryAction={<ItemSecondaryAction item={it} />}
+                        >
+                            <ItemCheckBox item={it} />
+                            <ListItemText primary={it.productName || 'no name'} secondary={it.quantity} />
+                        </ListItem>
+                    ))}
+                </List>
+            </Stack>
         </Container >
     )
 }

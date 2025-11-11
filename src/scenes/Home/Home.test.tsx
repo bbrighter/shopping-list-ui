@@ -1,7 +1,8 @@
-import { describe, expect, it } from 'vitest';
-import { render, screen, within } from '@testing-library/react';
+import { describe, expect, it, vi } from 'vitest';
+import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import Home from './Home';
+import { client } from '../../api/api';
 
 const findListItem = async (name: string) => {
     const prod = await screen.findByText(name)
@@ -69,5 +70,33 @@ describe('home page', () => {
 
     it('Create new', { skip: true }, async () => {
         render(<Home />)
+    })
+
+    it('Delete list', async () => {
+        const spy = vi.spyOn(client, 'GetOrCreateList')
+        render(<Home />)
+
+        await waitFor(() => {
+            expect(spy).toHaveBeenCalledOnce()
+        })
+        const finishListButton = await screen.findByText('Liste abschließen')
+        await userEvent.click(finishListButton)
+
+        expect(await screen.findByText('Liste löschen nicht möglich')).toBeInTheDocument()
+        const keepButton = screen.getByText('Behalten')
+        await userEvent.click(keepButton)
+
+        await waitFor(() => {
+            expect(screen.queryByText('Liste löschen nicht möglich')).not.toBeInTheDocument()
+        })
+
+        await userEvent.click(finishListButton)
+        const deleteButton = await screen.findByText('Dennoch löschen')
+        await userEvent.click(deleteButton)
+
+        await waitFor(() => {
+            expect(screen.queryByText('Liste löschen nicht möglich')).not.toBeInTheDocument()
+            expect(spy).toHaveBeenCalledTimes(2)
+        })
     })
 })

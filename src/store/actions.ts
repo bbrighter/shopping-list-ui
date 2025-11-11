@@ -80,3 +80,15 @@ export const fetchProducts = atom(null, async (get, set) => {
     set(productsAtom, products)
     set(productIsLoadedAtom, true)
 })
+
+export const deleteListAtom = atom(null, async (get, set, force: boolean) => {
+    try {
+        const listId = get(listIdAtom)
+        await client.DeleteList(listId, { Force: force })
+        set(listIsLoadedAtom, false)
+        return true
+    } catch {
+        return false
+    }
+
+})
