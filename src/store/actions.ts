@@ -15,17 +15,19 @@ export const fetchListAtom = atom(null, async (get, set) => {
     set(listIsLoadedAtom, true)
 })
 
-export const updateItemAtom = atom(null, (get, set, updatedItem: Item) => {
-    const items = get(itemsAtom)
-    const newItems = items.map(it => it.id == updatedItem.id ? updatedItem : it)
-    set(itemsAtom, newItems)
-})
-
 export const checkItemAtom = atom(null, async (get, set, id: number) => {
     const item = get(itemAtom)(id)
     const checkedItem = { ...item, checked: !item.checked }
     const newItems = get(itemsAtom).map(it => it.id == id ? checkedItem : it)
     await client.CheckItem(id)
+    set(itemsAtom, newItems)
+})
+
+export const changeItemQuantityAtom = atom(null, async (get, set, id: number, newQuantity?: number) => {
+    const item = get(itemAtom)(id)
+    const newItem = { ...item, quantity: newQuantity }
+    const newItems = get(itemsAtom).map(it => it.id == id ? newItem : it)
+    await client.PatchItem(id, { quantity: newQuantity ?? 0 })
     set(itemsAtom, newItems)
 })
 

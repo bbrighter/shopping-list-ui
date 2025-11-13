@@ -159,6 +159,10 @@ export namespace shoppinglist {
         name: string
     }
 
+    export interface ItemPatchParams {
+        quantity: number
+    }
+
     export class ServiceClient {
         private baseClient: BaseClient
 
@@ -169,6 +173,7 @@ export namespace shoppinglist {
             this.DeleteList = this.DeleteList.bind(this)
             this.GetOrCreateList = this.GetOrCreateList.bind(this)
             this.ListProducts = this.ListProducts.bind(this)
+            this.PatchItem = this.PatchItem.bind(this)
             this.PostItem = this.PostItem.bind(this)
             this.PostItemByName = this.PostItemByName.bind(this)
         }
@@ -200,6 +205,10 @@ export namespace shoppinglist {
             // Now make the actual call to the API
             const resp = await this.baseClient.callTypedAPI("GET", `/piid/${encodeURIComponent(piid)}/products`)
             return await resp.json() as entity.ProductListResponse
+        }
+
+        public async PatchItem(piid: string, itemId: number, params: ItemPatchParams): Promise<void> {
+            await this.baseClient.callTypedAPI("PATCH", `/piid/${encodeURIComponent(piid)}/item/${encodeURIComponent(itemId)}`, JSON.stringify(params))
         }
 
         public async PostItem(piid: string, listId: number, productId: number): Promise<entity.IdResponse> {

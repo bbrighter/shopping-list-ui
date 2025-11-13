@@ -34,6 +34,7 @@ export const handlers = [
         }
         return HttpResponse.json({}, { status: 400 })
     }),
+    http.patch(BASE_URL_WITH_PIID + '/item/:itemId', () => (HttpResponse.json({}))),
 ]
 
 function parseQuery(request: Request) {
