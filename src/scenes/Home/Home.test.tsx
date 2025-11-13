@@ -99,4 +99,19 @@ describe('home page', () => {
             expect(spy).toHaveBeenCalledTimes(2)
         })
     })
+
+    it('patch quantity', async () => {
+        render(<Home />)
+
+        const listItem2 = await findListItem('prod2')
+        const plusButton = within(listItem2).getByText('+')
+        expect(plusButton).toBeInTheDocument()
+        await userEvent.click(plusButton)
+        expect(within(listItem2).getByText('1')).toBeInTheDocument()
+
+        const minusButton = within(listItem2).getByText('-')
+        expect(minusButton).toBeInTheDocument()
+        await userEvent.click(minusButton)
+        expect(within(listItem2).queryByText('1')).not.toBeInTheDocument()
+    })
 })
