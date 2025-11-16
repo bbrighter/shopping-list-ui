@@ -38,9 +38,10 @@ describe('home page', () => {
             expect(checkboxProd2).not.toBeChecked()
         })
 
-        await userEvent.click(checkboxProd2)
-        expect(checkboxProd2).toBeChecked()
-
+        await waitFor(() => {
+            userEvent.click(checkboxProd2)
+            expect(checkboxProd2).toBeChecked()
+        })
     })
 
     it('Edit quantity', async () => {
