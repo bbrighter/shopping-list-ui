@@ -73,12 +73,9 @@ describe('home page', () => {
     })
 
     it('Delete list', async () => {
-        const spy = vi.spyOn(client, 'GetOrCreateList')
+        const spy = vi.spyOn(client, 'PostList')
         render(<Home />)
 
-        await waitFor(() => {
-            expect(spy).toHaveBeenCalledOnce()
-        })
         const finishListButton = await screen.findByText('Liste abschließen')
         await userEvent.click(finishListButton)
 
@@ -96,7 +93,7 @@ describe('home page', () => {
 
         await waitFor(() => {
             expect(screen.queryByText('Liste löschen nicht möglich')).not.toBeInTheDocument()
-            expect(spy).toHaveBeenCalledTimes(2)
+            expect(spy).toHaveBeenCalledOnce()
         })
     })
 

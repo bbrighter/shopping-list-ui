@@ -1,18 +1,37 @@
 import { atom } from 'jotai'
-import { itemsAtom, listIdAtom, listIsLoadedAtom, productIsLoadedAtom, productsAtom } from './atoms'
+import { etagAtom, itemsAtom, listIdAtom, productsAtom } from './atoms'
 import { client } from '../api/api'
-import { type Product } from './types'
+import { respToData, type Product } from './types'
 import { itemAtom } from './selectors'
-import { respToItem, respToList, type Item } from './types'
+import { respToItem, type Item } from './types'
+import { isAPIError } from '../api/generatedApi'
 
-export const fetchListAtom = atom(null, async (get, set) => {
-    if (get(listIsLoadedAtom)) return
+export const fetchDataAtom = atom(null, async (get, set) => {
+    try {
+        const ifNoneMatch = get(etagAtom)
+        const resp = await client.GetMoments({ IfNoneMatch: ifNoneMatch })
+        const { listId, items, products } = respToData(resp)
+        set(listIdAtom, listId)
+        set(itemsAtom, items)
+        set(productsAtom, products)
+        set(etagAtom, resp.ETag)
+    } catch (error) {
+        if (isAPIError(error) && error.status == 304) {
+            return
+        }
+        if (isAPIError(error) && error.status == 404) {
+            const resp = await client.PostList()
+            set(listIdAtom, resp.id)
+        }
+        // eslint-disable-next-line no-console
+        console.error('catch:', error)
+    }
 
-    const resp = await client.GetOrCreateList()
-    const list = respToList(resp)
-    set(listIdAtom, list.id)
-    set(itemsAtom, list.items)
-    set(listIsLoadedAtom, true)
+})
+
+export const createListAtom = atom(null, async (_get, set) => {
+    const resp = await client.PostList()
+    set(listIdAtom, resp.id)
 })
 
 export const checkItemAtom = atom(null, async (get, set, id: number) => {
@@ -67,27 +86,11 @@ export const deleteItemAtom = atom(null, async (get, set, id: number) => {
 })
 
 
-const getProducts = async (): Promise<Product[]> => {
-    const resp = await client.ListProducts()
-    return resp.products.map(p => ({
-        id: p.id,
-        name: p.name,
-    }))
-}
 
-
-export const fetchProducts = atom(null, async (get, set) => {
-    if (get(productIsLoadedAtom)) return
-    const products = await getProducts()
-    set(productsAtom, products)
-    set(productIsLoadedAtom, true)
-})
-
-export const deleteListAtom = atom(null, async (get, set, force: boolean) => {
+export const deleteListAtom = atom(null, async (get, _set, force: boolean) => {
     try {
         const listId = get(listIdAtom)
         await client.DeleteList(listId, { Force: force })
-        set(listIsLoadedAtom, false)
         return true
     } catch {
         return false

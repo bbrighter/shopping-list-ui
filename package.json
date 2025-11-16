@@ -11,6 +11,7 @@
     "lint:fix": "eslint . --fix && tsc",
     "preview": "vite preview",
     "knip": "knip",
+    "tsc": "tsc",
     "dependencies:ci": "npx depcruise src  --include-only \"^src\"",
     "dependencies:table": "npx depcruise src  --include-only \"^src\" --output-type html > graph.html",
     "dependencies:graph": "npx depcruise --include-only \"^src\" --output-type dot src | dot -T svg > graph.svg"
@@ -25,6 +26,7 @@
     "knip": "^5.67.1",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
+    "vite-plugin-checker": "^0.11.0",
     "wouter": "^3.7.1"
   },
   "devDependencies": {

@@ -1,6 +1,6 @@
 import { useAtomValue, useSetAtom } from 'jotai'
 import { useEffect } from 'react'
-import { fetchListAtom, fetchProducts, itemsWithNamesAtom } from '../../store'
+import { fetchDataAtom, itemsWithNamesAtom } from '../../store'
 import List from '@mui/material/List'
 import ListItem from '@mui/material/ListItem'
 import ListItemText from '@mui/material/ListItemText'
@@ -15,13 +15,16 @@ import Stack from '@mui/material/Stack'
 export default function Home() {
     const piid = useAtomValue(piidAtom)
     const items = useAtomValue(itemsWithNamesAtom)
-    const fetchList = useSetAtom(fetchListAtom)
-    const fetchProduct = useSetAtom(fetchProducts)
+    const fetchData = useSetAtom(fetchDataAtom)
 
 
     useEffect(() => {
-        fetchList()
-        fetchProduct()
+        fetchData()
+        const id = setInterval(() => {
+            fetchData()
+        }, 4000)
+
+        return () => clearInterval(id)
     }, [piid])
 
     return (

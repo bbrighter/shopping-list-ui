@@ -1,6 +1,6 @@
 import Button from '@mui/material/Button';
 import { useEffect, useState } from 'react';
-import { deleteListAtom, fetchListAtom } from '../../../store';
+import { createListAtom, deleteListAtom } from '../../../store';
 import { useSetAtom } from 'jotai';
 import Dialog from '@mui/material/Dialog';
 import DialogTitle from '@mui/material/DialogTitle';
@@ -13,7 +13,7 @@ export default function FinishListButton() {
     const [showConfirmation, setShowConfirmation] = useState(false)
     const [successfullyRemoved, setSuccessfullyRemoved] = useState(false)
     const deleteList = useSetAtom(deleteListAtom)
-    const getList = useSetAtom(fetchListAtom)
+    const createList = useSetAtom(createListAtom)
 
     const onClick = async () => {
         setLoading(true)
@@ -38,7 +38,7 @@ export default function FinishListButton() {
 
     useEffect(() => {
         if (successfullyRemoved) {
-            getList()
+            createList()
         }
     }, [successfullyRemoved])
 

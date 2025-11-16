@@ -163,6 +163,10 @@ export namespace shoppinglist {
         quantity: number
     }
 
+    export interface MomentsParams {
+        IfNoneMatch: number
+    }
+
     export class ServiceClient {
         private baseClient: BaseClient
 
@@ -171,11 +175,11 @@ export namespace shoppinglist {
             this.CheckItem = this.CheckItem.bind(this)
             this.DeleteItem = this.DeleteItem.bind(this)
             this.DeleteList = this.DeleteList.bind(this)
-            this.GetOrCreateList = this.GetOrCreateList.bind(this)
-            this.ListProducts = this.ListProducts.bind(this)
+            this.GetMoments = this.GetMoments.bind(this)
             this.PatchItem = this.PatchItem.bind(this)
             this.PostItem = this.PostItem.bind(this)
             this.PostItemByName = this.PostItemByName.bind(this)
+            this.PostList = this.PostList.bind(this)
         }
 
         public async CheckItem(piid: string, itemId: number): Promise<void> {
@@ -195,16 +199,19 @@ export namespace shoppinglist {
             await this.baseClient.callTypedAPI("DELETE", `/piid/${encodeURIComponent(piid)}/list/${encodeURIComponent(listId)}`, undefined, {query})
         }
 
-        public async GetOrCreateList(piid: string): Promise<entity.ListResponse> {
-            // Now make the actual call to the API
-            const resp = await this.baseClient.callTypedAPI("GET", `/piid/${encodeURIComponent(piid)}/list`)
-            return await resp.json() as entity.ListResponse
-        }
+        public async GetMoments(piid: string, params: MomentsParams): Promise<entity.MomentsResponse> {
+            // Convert our params into the objects we need for the request
+            const headers = makeRecord<string, string>({
+                "if-none-match": String(params.IfNoneMatch),
+            })
 
-        public async ListProducts(piid: string): Promise<entity.ProductListResponse> {
             // Now make the actual call to the API
-            const resp = await this.baseClient.callTypedAPI("GET", `/piid/${encodeURIComponent(piid)}/products`)
-            return await resp.json() as entity.ProductListResponse
+            const resp = await this.baseClient.callTypedAPI("GET", `/piid/${encodeURIComponent(piid)}/moments`, undefined, {headers})
+
+            //Populate the return object from the JSON body and received headers
+            const rtn = await resp.json() as entity.MomentsResponse
+            rtn.ETag = parseInt(mustBeSet("Header `etag`", resp.headers.get("etag")), 10)
+            return rtn
         }
 
         public async PatchItem(piid: string, itemId: number, params: ItemPatchParams): Promise<void> {
@@ -221,6 +228,12 @@ export namespace shoppinglist {
             // Now make the actual call to the API
             const resp = await this.baseClient.callTypedAPI("POST", `/piid/${encodeURIComponent(piid)}/list/${encodeURIComponent(listId)}/item`, JSON.stringify(params))
             return await resp.json() as entity.ItemResponse
+        }
+
+        public async PostList(piid: string): Promise<entity.IdResponse> {
+            // Now make the actual call to the API
+            const resp = await this.baseClient.callTypedAPI("POST", `/piid/${encodeURIComponent(piid)}/list`)
+            return await resp.json() as entity.IdResponse
         }
     }
 }
@@ -247,12 +260,10 @@ export namespace entity {
         quantity?: number
     }
 
-    export interface ListResponse {
-        id: number
+    export interface MomentsResponse {
+        ETag: number
+        listId: number
         items: ItemResponse[]
-    }
-
-    export interface ProductListResponse {
         products: ProductResponse[]
     }
 
@@ -285,6 +296,21 @@ function makeRecord<K extends string | number | symbol, V>(record: Record<K, V |
         }
     }
     return record as Record<K, V>
+}
+
+
+// mustBeSet will throw an APIError with the Data Loss code if value is null or undefined
+function mustBeSet<A>(field: string, value: A | null | undefined): A {
+    if (value === null || value === undefined) {
+        throw new APIError(
+            500,
+            {
+                code: ErrCode.DataLoss,
+                message: `${field} was unexpectedly ${value}`, // ${value} will create the string "null" or "undefined"
+            },
+        )
+    }
+    return value
 }
 
 function encodeWebSocketHeaders(headers: Record<string, string>) {
