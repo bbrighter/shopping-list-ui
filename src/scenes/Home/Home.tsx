@@ -17,7 +17,7 @@ export default function Home() {
     const items = useAtomValue(itemsWithNamesAtom)
     const fetchData = useSetAtom(fetchDataAtom)
 
-    usePolling(fetchData, 4000, [piid])
+    usePolling(fetchData, 4000, [piid, fetchData])
 
     return (
         <Container sx={{ padding: '2rem' }}>
