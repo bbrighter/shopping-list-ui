@@ -164,7 +164,7 @@ export namespace shoppinglist {
     }
 
     export interface MomentsParams {
-        IfNoneMatch: number
+        IfNoneMatch: string
     }
 
     export class ServiceClient {
@@ -202,7 +202,7 @@ export namespace shoppinglist {
         public async GetMoments(piid: string, params: MomentsParams): Promise<entity.MomentsResponse> {
             // Convert our params into the objects we need for the request
             const headers = makeRecord<string, string>({
-                "if-none-match": String(params.IfNoneMatch),
+                "if-none-match": params.IfNoneMatch,
             })
 
             // Now make the actual call to the API
@@ -210,7 +210,7 @@ export namespace shoppinglist {
 
             //Populate the return object from the JSON body and received headers
             const rtn = await resp.json() as entity.MomentsResponse
-            rtn.ETag = parseInt(mustBeSet("Header `etag`", resp.headers.get("etag")), 10)
+            rtn.ETag = mustBeSet("Header `etag`", resp.headers.get("etag"))
             return rtn
         }
 
@@ -261,7 +261,7 @@ export namespace entity {
     }
 
     export interface MomentsResponse {
-        ETag: number
+        ETag: string
         listId: number
         items: ItemResponse[]
         products: ProductResponse[]
