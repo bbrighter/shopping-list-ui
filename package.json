@@ -11,9 +11,11 @@
     "lint:fix": "eslint . --fix && tsc",
     "preview": "vite preview",
     "knip": "knip",
+    "tsc": "tsc",
     "dependencies:ci": "npx depcruise src  --include-only \"^src\"",
     "dependencies:table": "npx depcruise src  --include-only \"^src\" --output-type html > graph.html",
-    "dependencies:graph": "npx depcruise --include-only \"^src\" --output-type dot src | dot -T svg > graph.svg"
+    "dependencies:graph": "npx depcruise --include-only \"^src\" --output-type dot src | dot -T svg > graph.svg",
+    "prepare": "husky"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",
@@ -25,6 +27,7 @@
     "knip": "^5.67.1",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
+    "vite-plugin-checker": "^0.11.0",
     "wouter": "^3.7.1"
   },
   "devDependencies": {
@@ -41,6 +44,7 @@
     "eslint-plugin-react-hooks": "^5.2.0",
     "eslint-plugin-react-refresh": "^0.4.22",
     "globals": "^16.4.0",
+    "husky": "^9.1.7",
     "jsdom": "^27.1.0",
     "msw": "^2.12.0",
     "typescript": "~5.9.3",

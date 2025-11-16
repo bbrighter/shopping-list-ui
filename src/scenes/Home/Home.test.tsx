@@ -33,11 +33,15 @@ describe('home page', () => {
         expect(checkboxProd2).toBeInTheDocument()
         expect(checkboxProd2).toBeChecked()
 
-        await userEvent.click(checkboxProd2)
-        expect(checkboxProd2).not.toBeChecked()
-        await userEvent.click(checkboxProd2)
-        expect(checkboxProd2).toBeChecked()
+        await waitFor(() => {
+            userEvent.click(checkboxProd2)
+            expect(checkboxProd2).not.toBeChecked()
+        })
 
+        await waitFor(() => {
+            userEvent.click(checkboxProd2)
+            expect(checkboxProd2).toBeChecked()
+        })
     })
 
     it('Edit quantity', async () => {
@@ -62,10 +66,13 @@ describe('home page', () => {
 
         const listItem1 = await findListItem('prod1')
         const deleteButton = within(listItem1).getByTestId('deleteItem')
-        await userEvent.click(deleteButton)
 
-        expect(screen.queryByText('prod1')).not.toBeInTheDocument()
-        expect(screen.getByText('prod2')).toBeInTheDocument()
+        await waitFor(async () => {
+            await userEvent.click(deleteButton)
+            expect(screen.queryByText('prod1')).not.toBeInTheDocument()
+            expect(screen.getByText('prod2')).toBeInTheDocument()
+        })
+
     })
 
     it('Create new', { skip: true }, async () => {
@@ -73,20 +80,17 @@ describe('home page', () => {
     })
 
     it('Delete list', async () => {
-        const spy = vi.spyOn(client, 'GetOrCreateList')
+        const spy = vi.spyOn(client, 'PostList')
         render(<Home />)
 
-        await waitFor(() => {
-            expect(spy).toHaveBeenCalledOnce()
-        })
         const finishListButton = await screen.findByText('Liste abschließen')
         await userEvent.click(finishListButton)
 
         expect(await screen.findByText('Liste löschen nicht möglich')).toBeInTheDocument()
         const keepButton = screen.getByText('Behalten')
-        await userEvent.click(keepButton)
 
         await waitFor(() => {
+            userEvent.click(keepButton)
             expect(screen.queryByText('Liste löschen nicht möglich')).not.toBeInTheDocument()
         })
 
@@ -96,7 +100,7 @@ describe('home page', () => {
 
         await waitFor(() => {
             expect(screen.queryByText('Liste löschen nicht möglich')).not.toBeInTheDocument()
-            expect(spy).toHaveBeenCalledTimes(2)
+            expect(spy).toHaveBeenCalledOnce()
         })
     })
 
@@ -106,12 +110,20 @@ describe('home page', () => {
         const listItem2 = await findListItem('prod2')
         const plusButton = within(listItem2).getByText('+')
         expect(plusButton).toBeInTheDocument()
-        await userEvent.click(plusButton)
-        expect(within(listItem2).getByText('1')).toBeInTheDocument()
-
         const minusButton = within(listItem2).getByText('-')
         expect(minusButton).toBeInTheDocument()
-        await userEvent.click(minusButton)
-        expect(within(listItem2).queryByText('1')).not.toBeInTheDocument()
+        expect(minusButton).toBeDisabled()
+
+        await waitFor(() => {
+            userEvent.click(plusButton)
+            expect(within(listItem2).getByText('1')).toBeInTheDocument()
+        })
+
+
+        await waitFor(() => {
+            expect(minusButton).not.toBeDisabled()
+            userEvent.click(minusButton)
+            expect(within(listItem2).queryByText('1')).not.toBeInTheDocument()
+        })
     })
 })

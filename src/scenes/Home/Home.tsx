@@ -1,6 +1,5 @@
 import { useAtomValue, useSetAtom } from 'jotai'
-import { useEffect } from 'react'
-import { fetchListAtom, fetchProducts, itemsWithNamesAtom } from '../../store'
+import { fetchDataAtom, itemsWithNamesAtom } from '../../store'
 import List from '@mui/material/List'
 import ListItem from '@mui/material/ListItem'
 import ListItemText from '@mui/material/ListItemText'
@@ -11,18 +10,14 @@ import ItemSecondaryAction from './components/ItemSecondaryAction'
 import ItemCheckBox from './components/ItemCheckBox'
 import FinishListButton from './components/FinishListButton'
 import Stack from '@mui/material/Stack'
+import usePolling from '../../hooks/usePolling'
 
 export default function Home() {
     const piid = useAtomValue(piidAtom)
     const items = useAtomValue(itemsWithNamesAtom)
-    const fetchList = useSetAtom(fetchListAtom)
-    const fetchProduct = useSetAtom(fetchProducts)
+    const fetchData = useSetAtom(fetchDataAtom)
 
-
-    useEffect(() => {
-        fetchList()
-        fetchProduct()
-    }, [piid])
+    usePolling(fetchData, 4000, [piid, fetchData])
 
     return (
         <Container sx={{ padding: '2rem' }}>

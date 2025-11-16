@@ -17,13 +17,18 @@ export const respToItem = (resp: entity.ItemResponse): Item => {
     }
 }
 
-type List = { id: number, items: Array<Item> }
-
-export const respToList = (resp: entity.ListResponse): List => (
-    { id: resp.id, items: resp.items.map(it => respToItem(it)) }
-)
+export const respToData = (resp: entity.MomentsResponse): { listId: number, items: Array<Item>, products: Array<Product> } => {
+    const listId = resp.listId
+    const items = resp.items.map(it => respToItem(it))
+    const products = resp.products.map(p => respToProduct(p))
+    return { listId, items, products }
+}
 
 export type Product = {
     id: number
     name: string
 }
+
+const respToProduct = (resp: entity.ProductResponse): Product => (
+    { id: resp.id, name: resp.name }
+)
