@@ -34,6 +34,9 @@ jobs:
       - name: Dependencies
         run: pnpm run dependencies:ci
 
+      - name: Typescript
+        run: pnpm run tsc
+
       - name: Test
         run: pnpm test
         env:
