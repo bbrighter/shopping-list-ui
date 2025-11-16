@@ -1,3 +1,5 @@
 pnpm run knip
 pnpm run lint
 pnpm run dependencies:ci
+
+exit 1
