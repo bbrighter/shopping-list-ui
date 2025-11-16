@@ -1,1 +1,1 @@
-npm run test:nowatch
+pnpm run test:nowatch

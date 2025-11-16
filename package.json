@@ -14,7 +14,8 @@
     "tsc": "tsc",
     "dependencies:ci": "npx depcruise src  --include-only \"^src\"",
     "dependencies:table": "npx depcruise src  --include-only \"^src\" --output-type html > graph.html",
-    "dependencies:graph": "npx depcruise --include-only \"^src\" --output-type dot src | dot -T svg > graph.svg"
+    "dependencies:graph": "npx depcruise --include-only \"^src\" --output-type dot src | dot -T svg > graph.svg",
+    "prepare": "husky"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",
