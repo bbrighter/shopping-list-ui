@@ -46,7 +46,7 @@ export const inviteUserAtom = atom(null, async (get, set, { userName }: { userNa
     const piid = get(piidAtom)
     if (!piid) return
     try {
-        const resp = await authApi.AddUserToProductInstance(userName, piid)
+        const resp = await authApi.AddUserToProductInstance(piid, userName)
         const users = get(usersAtom)
         set(usersAtom, [...users, { id: resp.id, name: userName }])
     } catch (err: unknown) {
@@ -55,6 +55,14 @@ export const inviteUserAtom = atom(null, async (get, set, { userName }: { userNa
         }
     }
 
+})
+
+export const deleteUserAtom = atom(null, async (get, set, { userName }: { userName: string }) => {
+    const piid = get(piidAtom)
+    if (!piid) return
+    await authApi.RemoveUserFromProductInstance(piid, userName)
+    const updatedUsers = get(usersAtom).filter(u => u.name != userName)
+    set(usersAtom, updatedUsers)
 })
 
 

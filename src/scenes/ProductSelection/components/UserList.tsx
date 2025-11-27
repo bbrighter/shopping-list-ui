@@ -7,6 +7,7 @@ import { useEffect } from 'react'
 import { getUsersAtom, usersAtom } from '../../../store/authStore'
 import { useAtomValue, useSetAtom } from 'jotai'
 import { useUserAvatar } from '../hooks/useUserAvatar'
+import UserDeleteButton from './UserDeleteButton'
 
 export default function UserList() {
     const users = useAtomValue(usersAtom)
@@ -21,7 +22,9 @@ export default function UserList() {
     return (
         <List sx={{ pt: '1rem', pb: '1rem' }}>
             {users.map(u => (
-                <ListItem key={u.id}>
+                <ListItem key={u.id}
+                    secondaryAction={<UserDeleteButton user={u} />}
+                >
                     <ListItemAvatar sx={{ pr: '1rem' }}><Avatar {...props(u.name)} /></ListItemAvatar>
                     <ListItemText primary={u.name} />
                 </ListItem>

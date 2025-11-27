@@ -26,7 +26,7 @@ export default function UserManagement() {
                     padding: '1rem',
                     borderRadius: '0.5rem',
                 }}>
-                    <Typography variant='h4'>Benutzer</Typography>
+                    <Typography variant='h4'>Nutzerverwaltung</Typography>
                     <UserList />
                     <UserInvite />
                 </Box>

@@ -126,9 +126,9 @@ export namespace authentication {
             this.RemoveUserFromProductInstance = this.RemoveUserFromProductInstance.bind(this)
         }
 
-        public async AddUserToProductInstance(name: string, productInstanceId: string): Promise<UUIDResponse> {
+        public async AddUserToProductInstance(productInstanceId: string, name: string): Promise<UUIDResponse> {
             // Now make the actual call to the API
-            const resp = await this.baseClient.callTypedAPI("POST", `/user/${encodeURIComponent(name)}/product-instance/${encodeURIComponent(productInstanceId)}`)
+            const resp = await this.baseClient.callTypedAPI("POST", `/piid/${encodeURIComponent(productInstanceId)}/users/${encodeURIComponent(name)}`)
             return await resp.json() as UUIDResponse
         }
 
@@ -140,7 +140,7 @@ export namespace authentication {
 
         public async GetUsersForProductInstance(productInstanceId: string): Promise<UserListResponse> {
             // Now make the actual call to the API
-            const resp = await this.baseClient.callTypedAPI("GET", `/product-instance/${encodeURIComponent(productInstanceId)}/users`)
+            const resp = await this.baseClient.callTypedAPI("GET", `/piid/${encodeURIComponent(productInstanceId)}/users`)
             return await resp.json() as UserListResponse
         }
 
@@ -150,8 +150,8 @@ export namespace authentication {
             return await resp.json() as LoginResponse
         }
 
-        public async RemoveUserFromProductInstance(name: string, productInstanceId: string): Promise<void> {
-            await this.baseClient.callTypedAPI("DELETE", `/user/${encodeURIComponent(name)}/product-instance/${encodeURIComponent(productInstanceId)}`)
+        public async RemoveUserFromProductInstance(productInstanceId: string, name: string): Promise<void> {
+            await this.baseClient.callTypedAPI("DELETE", `/piid/${encodeURIComponent(productInstanceId)}/users/${encodeURIComponent(name)}`)
         }
     }
 }
