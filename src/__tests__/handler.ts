@@ -8,6 +8,7 @@ export const handlers = [
     http.get(BASE_URL + '/permissions', () => (HttpResponse.json({
         piid: 'ad0bd3b7-e017-4561-ae42-3a9d6444114f',
         appMapping: { 'shopping-list': true },
+        product: 'shopping-list',
     } as entity.AuthProductInstance)),
     ),
     http.get(BASE_URL_WITH_PIID + '/moments', () => HttpResponse.json({

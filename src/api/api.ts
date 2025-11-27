@@ -30,7 +30,7 @@ const fetcher = async (input: RequestInfo | URL, init?: RequestInit) => {
 
 const options: ClientOptions = {
     fetcher: fetcher,
-    auth: () => ({ Token: window.localStorage.getItem('token') || '' }),
+    auth: () => ({ Token: window.localStorage.getItem('new-token') || '' }),
 }
 
 

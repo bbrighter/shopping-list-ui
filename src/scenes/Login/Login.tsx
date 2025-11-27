@@ -3,8 +3,8 @@ import Container from '@mui/material/Container';
 import TextField from '@mui/material/TextField';
 import { useAtomValue, useSetAtom } from 'jotai';
 import { useEffect, useState } from 'react';
-import { piidAtom, postLoginAtom } from '../../store/auth';
 import { useLocation } from 'wouter';
+import { piidAtom, postLoginAtom } from '../../store/authStore/index.ts';
 
 export default function Login() {
     const [name, setName] = useState('')

@@ -101,6 +101,10 @@ export namespace authentication {
         token: string
     }
 
+    export interface UUIDResponse {
+        id: string
+    }
+
     export interface UserListResponse {
         users: UserResponse[]
     }
@@ -122,8 +126,10 @@ export namespace authentication {
             this.RemoveUserFromProductInstance = this.RemoveUserFromProductInstance.bind(this)
         }
 
-        public async AddUserToProductInstance(userId: string, productInstanceId: string): Promise<void> {
-            await this.baseClient.callTypedAPI("POST", `/user/${encodeURIComponent(userId)}/product-instance/${encodeURIComponent(productInstanceId)}`)
+        public async AddUserToProductInstance(name: string, productInstanceId: string): Promise<UUIDResponse> {
+            // Now make the actual call to the API
+            const resp = await this.baseClient.callTypedAPI("POST", `/user/${encodeURIComponent(name)}/product-instance/${encodeURIComponent(productInstanceId)}`)
+            return await resp.json() as UUIDResponse
         }
 
         public async GetPermissions(): Promise<entity.AuthData> {
@@ -144,8 +150,8 @@ export namespace authentication {
             return await resp.json() as LoginResponse
         }
 
-        public async RemoveUserFromProductInstance(userId: string, productInstanceId: string): Promise<void> {
-            await this.baseClient.callTypedAPI("DELETE", `/user/${encodeURIComponent(userId)}/product-instance/${encodeURIComponent(productInstanceId)}`)
+        public async RemoveUserFromProductInstance(name: string, productInstanceId: string): Promise<void> {
+            await this.baseClient.callTypedAPI("DELETE", `/user/${encodeURIComponent(name)}/product-instance/${encodeURIComponent(productInstanceId)}`)
         }
     }
 }
@@ -241,11 +247,14 @@ export namespace shoppinglist {
 export namespace entity {
     export interface AuthData {
         instances: AuthProductInstance[]
+        userName: string
+        userId: string
     }
 
     export interface AuthProductInstance {
         appMapping: { [key: string]: boolean }
         piid: string
+        product: string
     }
 
     export interface IdResponse {

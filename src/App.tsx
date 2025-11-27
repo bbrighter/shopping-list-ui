@@ -2,20 +2,26 @@ import { Route, Switch, useLocation } from 'wouter'
 import Login from './scenes/Login/Login'
 import Home from './scenes/Home/Home'
 import { useAtomValue, useSetAtom } from 'jotai'
-import { getPermissionsAtom, piidAtom, tokenAtom } from './store/auth'
 import { useEffect } from 'react'
+import { getPermissionsAtom, piidAtom, tokenAtom } from './store/authStore/index.ts'
+import { ProductSelection } from './scenes/ProductSelection/index.tsx'
+
 
 
 function App() {
     useSetPermissions()
     usePiidLocation()
+    useRedirectIfNoToken()
 
     return (
-        <Switch>
-            <Route path={'/login'} component={Login} />
-            <Route path={'/:piid'} component={Home} />
-            <Route>404, Not Found!</Route>
-        </Switch>
+        <>
+            <ProductSelection />
+            <Switch>
+                <Route path={'/login'} component={Login} />
+                <Route path={'/:piid'} component={Home} />
+                <Route>404, Not Found!</Route>
+            </Switch>
+        </>
     )
 }
 
@@ -32,8 +38,20 @@ const useSetPermissions = () => {
     }, [piid, token])
 }
 
+const useRedirectIfNoToken = () => {
+    const token = useAtomValue(tokenAtom)
+    const [, navigate] = useLocation()
+
+    useEffect(() => {
+        if (!token) {
+            navigate('/login')
+        }
+    }, [token])
+}
+
 const usePiidLocation = () => {
     const piid = useAtomValue(piidAtom)
+
     const [, navigate] = useLocation();
     useEffect(() => {
         if (piid) {

@@ -4,7 +4,8 @@ import { setupServer } from 'msw/node'
 import { afterAll, afterEach, beforeAll, beforeEach, expect } from 'vitest';
 import { handlers } from './handler';
 import { getDefaultStore } from 'jotai';
-import { piidAtom } from '../store/auth';
+import { selectedProductInstanceAtom } from '../store/authStore';
+
 
 
 expect.extend(matchers);
@@ -21,7 +22,7 @@ beforeAll(() => {
 })
 beforeEach(() => {
     const store = getDefaultStore()
-    store.set(piidAtom, '1234')
+    store.set(selectedProductInstanceAtom, { id: '1234', productId: 'prod-id', productName: 'prod', selected: true })
 })
 afterEach(() => {
     server.resetHandlers()
