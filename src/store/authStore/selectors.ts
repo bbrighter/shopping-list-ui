@@ -6,4 +6,4 @@ export const piidAtom = atom((get) => {
     return selectedInstance?.id
 })
 
-export const userNameAtom = atom((get) => (get(userAtom)?.name || 'Unbekannt'))
+export const userNameAtom = atom((get) => (get(userAtom)?.name))

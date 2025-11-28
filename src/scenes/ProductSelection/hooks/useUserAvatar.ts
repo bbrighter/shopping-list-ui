@@ -11,15 +11,20 @@ export function useUserAvatar(name: string) {
 }
 
 
-function stringAvatar(name: string) {
-    const letters = name.split(' ')
-    let initials = letters[0][0].toUpperCase()
-    if (letters.length > 1) {
-        initials += letters[1][0].toUpperCase()
+function stringAvatar(name: string | undefined) {
+    let bgColor = 'rgb(107, 107, 107)'
+    let initials = ''
+    if (name) {
+        const letters = name.split(' ')
+        initials = letters[0][0].toUpperCase()
+        if (letters.length > 1) {
+            initials += letters[1][0].toUpperCase()
+        }
+        bgColor = stringToColor(name)
     }
     return {
         sx: {
-            bgcolor: stringToColor(name),
+            bgcolor: bgColor,
             marginLeft: 'auto',
         },
         children: initials,

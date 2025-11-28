@@ -17,6 +17,7 @@ export const postLoginAtom = atom(null, async (_get, set, { password, userName }
 
 export const logoutAtom = atom(null, (_get, set) => {
     set(tokenAtom, '')
+    set(userAtom, undefined)
 })
 
 
