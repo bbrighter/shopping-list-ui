@@ -17,6 +17,9 @@ export default function UserInvite() {
         const status = await inviteUser({ userName: userToInvite })
         setStatus(status)
         setInviteLoading(false)
+        if (status == undefined) {
+            setUserToInvite('')
+        }
     }
 
     const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
