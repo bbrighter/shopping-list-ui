@@ -5,6 +5,7 @@ export type ProductInstance = {
     productName: string
     productId: string
     selected: boolean
+    url: string
 }
 
 export const respToProductInstances = (resp: entity.AuthData): Array<ProductInstance> => {
@@ -12,19 +13,20 @@ export const respToProductInstances = (resp: entity.AuthData): Array<ProductInst
         return {
             id: i.piid,
             productId: i.product,
-            productName: productIdToName(i.product),
+            productName: productMap[i.product as ProductKey].name,
+            url: productMap[i.product as ProductKey].url,
             selected: false,
         }
     })
 }
 
-const idMap = new Map()
-idMap.set('shopping-list', 'Einkaufsliste')
-idMap.set('hista-complete', 'Hista')
+type ProductKey = 'shopping-list' | 'hista-complete'
 
-const productIdToName = (id: string): string => {
-    return idMap.get(id)
-}
+const productMap: Record<ProductKey, { name: string, url: string }> = {
+    'shopping-list': { name: 'Einkaufsliste', url: 'https://shopping-list-ui.vercel.app' },
+    'hista-complete': { name: 'Hista', url: 'https://hista-ui.vercel.app' },
+} as const
+
 
 
 export type User = {

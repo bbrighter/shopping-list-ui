@@ -22,7 +22,7 @@ beforeAll(() => {
 })
 beforeEach(() => {
     const store = getDefaultStore()
-    store.set(selectedProductInstanceAtom, { id: '1234', productId: 'prod-id', productName: 'prod', selected: true })
+    store.set(selectedProductInstanceAtom, { id: '1234', productId: 'prod-id', productName: 'prod', selected: true, url: '' })
 })
 afterEach(() => {
     server.resetHandlers()
