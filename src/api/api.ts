@@ -1,6 +1,7 @@
+/* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { navigate } from 'wouter/use-browser-location';
 import Client, { Environment, Local, type ClientOptions } from './generatedApi';
+import { fetcher } from './fetcher';
 
 
 
@@ -19,14 +20,6 @@ const baseUrl = import.meta.env.MODE === 'test'
         ? getStageURL()
         : Local
 
-
-const fetcher = async (input: RequestInfo | URL, init?: RequestInit) => {
-    const resp = await fetch(input, init)
-    if (resp.status == 401) {
-        navigate('/login')
-    }
-    return resp
-}
 
 const options: ClientOptions = {
     fetcher: fetcher,

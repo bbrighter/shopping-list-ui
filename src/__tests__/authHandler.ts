@@ -8,7 +8,7 @@ export const authHandlers = (url: string) => ([
         userName: 'user 1',
         instances: [
             {
-                piid: 'ad0bd3b7-e017-4561-ae42-3a9d6444114f',
+                piid: '68a06340-c811-4820-bb18-fbe750f24f4a',
                 appMapping: { 'shopping-list': true },
                 product: 'shopping-list',
             },
