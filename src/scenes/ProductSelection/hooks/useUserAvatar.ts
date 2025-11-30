@@ -33,6 +33,7 @@ function stringAvatar(name: string | undefined) {
 
 
 function stringToColor(string: string) {
+    if (string == 'Julia') return '#4169E1'
     let hash = 0;
     let i;
 
