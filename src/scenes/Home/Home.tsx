@@ -10,8 +10,8 @@ import ItemSecondaryAction from './components/ItemSecondaryAction'
 import ItemCheckBox from './components/ItemCheckBox'
 import FinishListButton from './components/FinishListButton'
 import Stack from '@mui/material/Stack'
-import usePolling from '../../hooks/usePolling'
 import { piidAtom } from '../../store/authStore/index.ts'
+import usePolling from './hooks/usePolling.ts'
 
 export default function Home() {
     const piid = useAtomValue(piidAtom)

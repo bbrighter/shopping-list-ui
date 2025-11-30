@@ -10,11 +10,11 @@ export const fetchDataAtom = atom(null, async (get, set) => {
     try {
         const ifNoneMatch = get(etagAtom)
         const resp = await client.GetMoments({ IfNoneMatch: ifNoneMatch })
-        const { listId, items, products } = respToData(resp)
+        const { listId, items, products, etag } = respToData(resp)
         set(listIdAtom, listId)
         set(itemsAtom, items)
         set(productsAtom, products)
-        set(etagAtom, resp.ETag)
+        set(etagAtom, etag)
     } catch (error) {
         if (isAPIError(error) && error.status == 304) {
             return

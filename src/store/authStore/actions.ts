@@ -1,6 +1,6 @@
 import { atom, getDefaultStore } from 'jotai'
 import { authApi, injectPiidGetter } from '../../api/api'
-import { authProblemAtom, productInstancesAtom, selectedProductInstanceAtom, tokenAtom, userAtom, usersAtom } from './atoms'
+import { authProblemAtom, productInstancesAtom, tokenAtom, userAtom, usersAtom } from './atoms'
 import { respToProductInstances, type User } from './types'
 import { piidAtom } from './selectors'
 import { APIError } from '../../api/generatedApi'
@@ -25,10 +25,6 @@ export const getPermissionsAtom = atom(null, async (get, set) => {
     if (get(authProblemAtom)) {
         const resp = await authApi.GetPermissions()
         const instances = respToProductInstances(resp)
-        set(productInstancesAtom, instances)
-        const instanceIndex = instances.findIndex(i => i.productId == 'shopping-list')
-        set(selectedProductInstanceAtom, instances[instanceIndex])
-        instances.splice(instanceIndex, 1, { ...instances[instanceIndex], selected: true })
         set(productInstancesAtom, instances)
         set(authProblemAtom, false)
         set(userAtom, { id: resp.userId, name: resp.userName })

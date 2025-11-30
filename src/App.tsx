@@ -5,13 +5,14 @@ import { useAtomValue, useSetAtom } from 'jotai'
 import { useEffect } from 'react'
 import { getPermissionsAtom, piidAtom, tokenAtom } from './store/authStore/index.ts'
 import { ProductSelection } from './scenes/ProductSelection/index.tsx'
+import { AUTH_EVENT_NAME } from './api/fetcher.ts'
 
 
 
 function App() {
     useSetPermissions()
     usePiidLocation()
-    useRedirectIfNoToken()
+    useHandleUnauthorized()
 
     return (
         <>
@@ -38,16 +39,6 @@ const useSetPermissions = () => {
     }, [piid, token])
 }
 
-const useRedirectIfNoToken = () => {
-    const token = useAtomValue(tokenAtom)
-    const [, navigate] = useLocation()
-
-    useEffect(() => {
-        if (!token) {
-            navigate('/login')
-        }
-    }, [token])
-}
 
 const usePiidLocation = () => {
     const piid = useAtomValue(piidAtom)
@@ -62,3 +53,25 @@ const usePiidLocation = () => {
     }, [piid])
 }
 
+
+const useHandleUnauthorized = () => {
+    const [, navigate] = useLocation();
+
+    useEffect(() => {
+        const onUnauthorized = (e: Event) => {
+            const path = (e as CustomEvent).detail as string
+
+            if (!path) return
+
+            if (path.includes('login')) return
+
+            const guidRegex = /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/
+            const match = path.match(guidRegex)
+            const redirectPath = match ? `/login?piid=${match}` : '/login'
+            navigate(redirectPath)
+        }
+
+        window.addEventListener(AUTH_EVENT_NAME, onUnauthorized)
+        return () => window.removeEventListener(AUTH_EVENT_NAME, onUnauthorized)
+    }, [])
+}

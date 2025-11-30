@@ -4,7 +4,7 @@ import { setupServer } from 'msw/node'
 import { afterAll, afterEach, beforeAll, beforeEach, expect } from 'vitest';
 import { handlers } from './handler';
 import { getDefaultStore } from 'jotai';
-import { selectedProductInstanceAtom } from '../store/authStore';
+import { locationAtom, productInstancesAtom } from '../store/authStore';
 
 
 
@@ -22,7 +22,8 @@ beforeAll(() => {
 })
 beforeEach(() => {
     const store = getDefaultStore()
-    store.set(selectedProductInstanceAtom, { id: '1234', productId: 'prod-id', productName: 'prod', selected: true, url: '' })
+    store.set(productInstancesAtom, [{ id: '68a06340-c811-4820-bb18-fbe750f24f4a', productId: 'prod-id', productName: 'prod', selected: true, url: '' }])
+    store.set(locationAtom, { pathname: '/68a06340-c811-4820-bb18-fbe750f24f4a' })
 })
 afterEach(() => {
     server.resetHandlers()

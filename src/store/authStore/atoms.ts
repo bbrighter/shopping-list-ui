@@ -1,4 +1,5 @@
 import { atom } from 'jotai';
+import { atomWithLocation } from 'jotai-location'
 import type { ProductInstance, User } from './types';
 import { atomWithStorage } from 'jotai/utils';
 
@@ -10,8 +11,8 @@ const storage = {
 
 export const productInstancesAtom = atom<Array<ProductInstance>>([])
 export const tokenAtom = atomWithStorage('new-token', '', storage)
-export const selectedProductInstanceAtom = atom<ProductInstance | undefined>()
 export const authProblemAtom = atom(true)
 export const userAtom = atom<User | undefined>()
 export const usersAtom = atom<Array<User>>([])
+export const locationAtom = atomWithLocation()
 
