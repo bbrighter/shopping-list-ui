@@ -2,6 +2,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import Client, { Environment, Local, type ClientOptions } from './generatedApi';
 import { fetcher } from './fetcher';
+import { piid } from '@bbrighter/auth-module';
 
 
 
@@ -42,13 +43,29 @@ type PiidInjectedClient<T> = {
 }
 
 
-let getPiid: (() => string | null) | null = null
-export const injectPiidGetter = (getter: () => string | null) => {
-    getPiid = getter
-}
-
 
 export const client: PiidInjectedClient<typeof baseClient.shoppinglist> = new Proxy(baseClient.shoppinglist, {
+    get(target, prop, receiver) {
+        const orig = Reflect.get(target, prop, receiver)
+        if (typeof orig !== 'function') {
+            return orig
+        }
+
+        return (...args: any[]) => {
+            const pi_id = piid()
+            if (!pi_id) {
+                // eslint-disable-next-line no-console
+                console.warn('no piid injected')
+                return
+            }
+            return orig.call(target, pi_id, ...args)
+        }
+    },
+}) as any
+
+
+
+export const authClient: PiidInjectedClient<typeof baseClient.authentication> = new Proxy(baseClient.authentication, {
     get(target, prop, receiver) {
         const orig = Reflect.get(target, prop, receiver)
 
@@ -57,11 +74,13 @@ export const client: PiidInjectedClient<typeof baseClient.shoppinglist> = new Pr
         }
 
         return (...args: any[]) => {
-            const piid = getPiid?.()
-            if (!piid) {
+            const pi_id = piid?.()
+            if (!pi_id) {
+                // eslint-disable-next-line no-console
+                console.warn('no piid injected')
                 return
             }
-            return orig.call(target, piid, ...args)
+            return orig.call(target, pi_id, ...args)
         }
     },
 }) as any

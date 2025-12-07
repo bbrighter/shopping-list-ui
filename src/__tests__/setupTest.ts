@@ -1,12 +1,8 @@
 import * as matchers from '@testing-library/jest-dom/matchers';
 import '@testing-library/jest-dom'
 import { setupServer } from 'msw/node'
-import { afterAll, afterEach, beforeAll, beforeEach, expect } from 'vitest';
+import { afterAll, afterEach, beforeAll, beforeEach, expect, vi } from 'vitest';
 import { handlers } from './handler';
-import { getDefaultStore } from 'jotai';
-import { locationAtom, productInstancesAtom } from '../store/authStore';
-
-
 
 expect.extend(matchers);
 
@@ -21,9 +17,10 @@ beforeAll(() => {
     // })
 })
 beforeEach(() => {
-    const store = getDefaultStore()
-    store.set(productInstancesAtom, [{ id: '68a06340-c811-4820-bb18-fbe750f24f4a', productId: 'prod-id', productName: 'prod', selected: true, url: '' }])
-    store.set(locationAtom, { pathname: '/68a06340-c811-4820-bb18-fbe750f24f4a' })
+    vi.mock('@bbrighter/auth-module', () => ({
+        usePiid: () => '68a06340-c811-4820-bb18-fbe750f24f4a',
+        piid: () => '68a06340-c811-4820-bb18-fbe750f24f4a',
+    }))
 })
 afterEach(() => {
     server.resetHandlers()

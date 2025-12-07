@@ -6,11 +6,6 @@ export function useCurrentUserAvatar() {
     return stringAvatar(userName)
 }
 
-export function useUserAvatar(name: string) {
-    return stringAvatar(name)
-}
-
-
 function stringAvatar(name: string | undefined) {
     let bgColor = 'rgb(107, 107, 107)'
     let initials = ''

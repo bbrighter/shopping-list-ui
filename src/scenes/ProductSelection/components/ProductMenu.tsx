@@ -3,8 +3,9 @@ import { useState } from 'react';
 import Avatar from '@mui/material/Avatar';
 import { LogoutMenuEntry } from './LogoutMenuEntry';
 import { useCurrentUserAvatar } from '../hooks/useUserAvatar';
-import UserManagement from './UserManagement';
+
 import ProductSelection from './ProductSelection';
+import UserManagement from './UserManagementButton';
 
 
 export function ProductMenu() {

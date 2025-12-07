@@ -1,22 +1,15 @@
-import Box from '@mui/material/Box';
-import Modal from '@mui/material/Modal';
-import Typography from '@mui/material/Typography';
-
-import UserInvite from './UserInvite';
-import UserList from './UserList';
-import { MenuItem } from '@mui/material';
+import { Box, MenuItem, Modal } from '@mui/material';
 import { useState } from 'react';
+import { UserManagement } from '@bbrighter/auth-module'
+import { authClient } from '../../../api/api';
 
-export default function UserManagement() {
+export default function UserManagementButton() {
     const [open, setOpen] = useState(false)
 
     return (
         <>
             <MenuItem onClick={() => setOpen(true)}>Benutzer</MenuItem>
-            <Modal
-                open={open}
-                onClose={() => setOpen(false)}
-            >
+            <Modal open={open} onClose={() => setOpen(false)}>
                 <Box sx={{
                     width: '80%', bgcolor: 'background.paper', position: 'absolute',
                     maxWidth: '750px',
@@ -26,11 +19,9 @@ export default function UserManagement() {
                     padding: '1rem',
                     borderRadius: '0.5rem',
                 }}>
-                    <Typography variant='h4'>Nutzerverwaltung</Typography>
-                    <UserList />
-                    <UserInvite />
+                    <UserManagement api={authClient} />
                 </Box>
-            </Modal>
+            </Modal >
         </>
     )
 }

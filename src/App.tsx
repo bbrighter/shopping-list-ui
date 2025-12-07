@@ -1,18 +1,16 @@
-import { Route, Switch, useLocation } from 'wouter'
-import Login from './scenes/Login/Login'
+import { Redirect, Route, Switch, useLocation } from 'wouter'
 import Home from './scenes/Home/Home'
-import { useAtomValue, useSetAtom } from 'jotai'
 import { useEffect } from 'react'
-import { getPermissionsAtom, piidAtom, tokenAtom } from './store/authStore/index.ts'
 import { ProductSelection } from './scenes/ProductSelection/index.tsx'
-import { AUTH_EVENT_NAME } from './api/fetcher.ts'
+import { useGetPermissions, useToken, useHandleUnauthorized, Login, usePiid } from '@bbrighter/auth-module'
 
 
 
 function App() {
+    const [_, navigate] = useLocation()
     useSetPermissions()
     usePiidLocation()
-    useHandleUnauthorized()
+    useHandleUnauthorized(navigate)
 
     return (
         <>
@@ -20,7 +18,9 @@ function App() {
             <Switch>
                 <Route path={'/login'} component={Login} />
                 <Route path={'/:piid'} component={Home} />
-                <Route>404, Not Found!</Route>
+                <Route>
+                    <Redirect to='/login' />
+                </Route>
             </Switch>
         </>
     )
@@ -30,18 +30,13 @@ export default App
 
 
 const useSetPermissions = () => {
-    const piid = useAtomValue(piidAtom)
-    const token = useAtomValue(tokenAtom)
-    const getPermissions = useSetAtom(getPermissionsAtom)
-
-    useEffect(() => {
-        getPermissions()
-    }, [piid, token])
+    const token = useToken()
+    useGetPermissions([token])
 }
 
 
 const usePiidLocation = () => {
-    const piid = useAtomValue(piidAtom)
+    const piid = usePiid()
 
     const [, navigate] = useLocation();
     useEffect(() => {
@@ -54,24 +49,3 @@ const usePiidLocation = () => {
 }
 
 
-const useHandleUnauthorized = () => {
-    const [, navigate] = useLocation();
-
-    useEffect(() => {
-        const onUnauthorized = (e: Event) => {
-            const path = (e as CustomEvent).detail as string
-
-            if (!path) return
-
-            if (path.includes('login')) return
-
-            const guidRegex = /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/
-            const match = path.match(guidRegex)
-            const redirectPath = match ? `/login?piid=${match}` : '/login'
-            navigate(redirectPath)
-        }
-
-        window.addEventListener(AUTH_EVENT_NAME, onUnauthorized)
-        return () => window.removeEventListener(AUTH_EVENT_NAME, onUnauthorized)
-    }, [])
-}

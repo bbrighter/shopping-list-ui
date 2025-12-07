@@ -8,6 +8,11 @@ import { defineConfig, globalIgnores } from 'eslint/config'
 export default defineConfig([
   globalIgnores(['dist']),
   {
+    languageOptions: {
+      parserOptions: {
+        tsconfigRootDir: import.meta.dirname,
+      },
+    },
     files: ['**/*.{ts,tsx}'],
     extends: [
       js.configs.recommended,
@@ -26,8 +31,8 @@ export default defineConfig([
       'no-console': 'warn',
       'react/react-in-jsx-scope': 'off',
       'react-hooks/exhaustive-deps': 'off',
-      'no-unused-vars': 'warn',
-      '@typescript-eslint/no-unused-vars': ['warn'],
+      'no-unused-vars': ['warn', { "varsIgnorePattern": "_.*" }],
+      '@typescript-eslint/no-unused-vars': ['warn', { "varsIgnorePattern": "_.*" }],
     }
   },
 ])
