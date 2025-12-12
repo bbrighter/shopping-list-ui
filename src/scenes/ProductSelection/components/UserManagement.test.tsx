@@ -1,17 +1,23 @@
 import { render, screen } from '@testing-library/react';
-import { beforeEach, describe, expect, it } from 'vitest';
-import UserManagement from './UserManagementButton';
+import { describe, expect, it } from 'vitest';
 import userEvent from '@testing-library/user-event';
+import { AuthProvider, UserManagementProvider } from '@bbrighter/auth-module';
+import { authApi, authClient } from '../../../api/api';
+import App from '../../../App';
 
-describe('user management', { skip: true }, () => {
-    beforeEach(() => {
-        // const store = getDefaultStore()
-        // store.set(getPermissionsAtom)
-    })
+describe('user management', () => {
 
     it('show and invite users', async () => {
-        render(<UserManagement />)
+        render(
+            <AuthProvider api={authApi} productKey='shopping-list'>
+                <UserManagementProvider api={authClient}>
+                    <App />
+                </UserManagementProvider>
+            </AuthProvider>,
+        )
 
+        const avatar = await screen.findByText('U1')
+        await userEvent.click(avatar)
         const userMenuButton = await screen.findByText('Benutzer')
         await userEvent.click(userMenuButton)
 

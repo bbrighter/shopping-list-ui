@@ -10,17 +10,22 @@ export const server = setupServer(...handlers)
 
 beforeAll(() => {
     server.listen({ onUnhandledRequest: 'error' })
-    // // Uncomment to allow debugging more easily
+    // Uncomment to allow debugging more easily
     // server.events.on('request:start', ({ request }) => {
     //     console.log('➡️', request.method, request.url)
     //     console.log('   Headers:', Object.fromEntries(request.headers.entries()))
     // })
 })
 beforeEach(() => {
-    vi.mock('@bbrighter/auth-module', () => ({
-        usePiid: () => '68a06340-c811-4820-bb18-fbe750f24f4a',
-        piid: () => '68a06340-c811-4820-bb18-fbe750f24f4a',
-    }))
+    vi.mock('@bbrighter/auth-module', async (importOriginal) => {
+        const actual = await importOriginal()
+        return {
+            ...(actual as Record<string, unknown>),
+            usePiid: () => '68a06340-c811-4820-bb18-fbe750f24f4a',
+            piid: () => '68a06340-c811-4820-bb18-fbe750f24f4a',
+            useToken: () => 'abc',
+        }
+    })
 })
 afterEach(() => {
     server.resetHandlers()

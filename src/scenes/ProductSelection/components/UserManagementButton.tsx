@@ -1,10 +1,10 @@
 import { Box, MenuItem, Modal } from '@mui/material';
 import { useState } from 'react';
-import { UserManagement } from '@bbrighter/auth-module'
-import { authClient } from '../../../api/api';
+import { UserManagement, useUserName } from '@bbrighter/auth-module'
 
 export default function UserManagementButton() {
     const [open, setOpen] = useState(false)
+    const userName = useUserName()
 
     return (
         <>
@@ -19,7 +19,7 @@ export default function UserManagementButton() {
                     padding: '1rem',
                     borderRadius: '0.5rem',
                 }}>
-                    <UserManagement api={authClient} />
+                    <UserManagement currentUserName={userName} />
                 </Box>
             </Modal >
         </>

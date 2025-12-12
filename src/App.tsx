@@ -30,15 +30,19 @@ export default App
 
 
 const useSetPermissions = () => {
+    const getPermissions = useGetPermissions()
+
     const token = useToken()
-    useGetPermissions([token])
+    useEffect(() => {
+        getPermissions()
+    }, [token])
 }
 
 
 const usePiidLocation = () => {
     const piid = usePiid()
+    const [, navigate] = useLocation()
 
-    const [, navigate] = useLocation();
     useEffect(() => {
         if (piid) {
             navigate(`/${piid}`, {

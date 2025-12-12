@@ -2,8 +2,8 @@ import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import App from './App.tsx'
 import { createTheme, CssBaseline, ThemeProvider } from '@mui/material'
-import { AuthProvider } from '@bbrighter/auth-module'
-import { authApi } from './api/api.ts'
+import { AuthProvider, UserManagementProvider } from '@bbrighter/auth-module'
+import { authApi, authClient } from './api/api.ts'
 
 const theme = createTheme({
   palette: {
@@ -16,7 +16,9 @@ createRoot(document.getElementById('root')!).render(
     <ThemeProvider theme={theme}>
       <CssBaseline />
       <AuthProvider api={authApi} productKey='shopping-list'>
-        <App />
+        <UserManagementProvider api={authClient}>
+          <App />
+        </UserManagementProvider >
       </AuthProvider>
     </ThemeProvider>
   </StrictMode>,

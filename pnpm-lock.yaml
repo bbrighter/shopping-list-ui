@@ -214,7 +214,7 @@ packages:
     engines: {node: '>=6.9.0'}
 
   '@bbrighter/auth-module@file:../auth-module/bbrighter-auth-module-0.1.1.tgz':
-    resolution: {integrity: sha512-hCe7p0IQ1uuaaAJJ90JUEl1LJoGyk12IyM7n6+JUfZMKAWX85AENod8ZhXJzjqlAQ2DCkmxW8XGcEV4hNFWNoA==, tarball: file:../auth-module/bbrighter-auth-module-0.1.1.tgz}
+    resolution: {integrity: sha512-JvJzCHGnhuX+WjeylahVP+KopkL6hjvgjg9YQAj1h3pv/bhafZhSzHhvWTnlcKDixMfNCkkX9EWRh+ZXtT/MAA==, tarball: file:../auth-module/bbrighter-auth-module-0.1.1.tgz}
     version: 0.1.1
     peerDependencies:
       '@emotion/react': 11.x
@@ -222,9 +222,9 @@ packages:
       '@mui/icons-material': 7.x
       '@mui/material': 7.x
       jotai: 2.x
-      jotai-location: ^0.6.2
+      jotai-location: 0.x
       react: 19.x
-      wouter: ^3.x
+      wouter: 3.x
 
   '@bcoe/v8-coverage@1.0.2':
     resolution: {integrity: sha512-6zABk/ECA/QYSCQ1NGiVwwbQerUCZ+TQbp64Q3AgmfNvurHH0j8TtXa1qbShXA6qqkpAj4V5W8pP6mLe1mcMqA==}

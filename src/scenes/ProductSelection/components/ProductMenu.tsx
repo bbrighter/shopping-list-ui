@@ -1,18 +1,15 @@
 import Menu from '@mui/material/Menu';
 import { useState } from 'react';
-import Avatar from '@mui/material/Avatar';
 import { LogoutMenuEntry } from './LogoutMenuEntry';
-import { useCurrentUserAvatar } from '../hooks/useUserAvatar';
-
 import ProductSelection from './ProductSelection';
 import UserManagement from './UserManagementButton';
+import { UserAvatar, useUserName } from '@bbrighter/auth-module';
 
 
 export function ProductMenu() {
     const [anchor, setAnchor] = useState<null | HTMLElement>(null)
     const open = Boolean(anchor)
-
-    const props = useCurrentUserAvatar()
+    const userName = useUserName()
 
     const handleClose = () => setAnchor(null)
     const handleClick = (e: React.MouseEvent<HTMLDivElement>) => { setAnchor(e.currentTarget) }
@@ -20,9 +17,9 @@ export function ProductMenu() {
 
     return (
         <>
-            <Avatar
+            <UserAvatar
                 onClick={handleClick}
-                {...props}
+                userName={userName}
             />
             <Menu
                 open={open}

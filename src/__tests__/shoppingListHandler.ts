@@ -12,6 +12,7 @@ export const shoppingListHandlers = (url: string) => ([
         products: [
             { id: 1, name: 'prod1' },
             { id: 2, name: 'prod2' },
+            { id: 3, name: 'prod3' },
         ],
     } as entity.MomentsResponse, {
         headers: {
@@ -19,6 +20,8 @@ export const shoppingListHandlers = (url: string) => ([
         },
     })),
     http.post(url + '/list', () => (HttpResponse.json({ ID: 2 }))),
+    http.post(url + '/list/:listId/item', () => (HttpResponse.json({ id: 3 }))),
+    http.post(url + '/list/:listId/item/:itemId', () => (HttpResponse.json({ id: 3, productId: 3, listId: 1, checked: false }))),
     http.patch(url + '/item/:itemId/check', () => (HttpResponse.json({}))),
     http.delete(url + '/item/:itemId', () => (HttpResponse.json({}))),
     http.delete(url + '/list/:listId', ({ request }) => {

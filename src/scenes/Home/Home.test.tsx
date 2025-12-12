@@ -75,8 +75,35 @@ describe('home page', () => {
 
     })
 
-    it('Create new', { skip: true }, async () => {
+    it('Create new item by name', async () => {
+        const spy = vi.spyOn(client, 'PostItemByName')
         render(<Home />)
+
+        const combobox = await screen.findByRole('combobox')
+        await userEvent.type(combobox, 'new item{enter}')
+
+        const newItem = await screen.findByText('new item')
+        expect(newItem).toBeInTheDocument()
+        expect(newItem.closest('li')).toBeInTheDocument()
+
+        expect(spy).toHaveBeenCalledWith('68a06340-c811-4820-bb18-fbe750f24f4a', 1, { name: 'new item' })
+    })
+
+    it('Create item based on existing product', async () => {
+        const spy = vi.spyOn(client, 'PostItem')
+        render(<Home />)
+
+        const combobox = await screen.findByRole('combobox')
+        await userEvent.type(combobox, 'prod')
+        const option = screen.getByText('prod3')
+        await userEvent.click(option)
+
+
+        const newItem = await screen.findByText('prod3')
+        expect(newItem).toBeInTheDocument()
+        expect(newItem.closest('li')).toBeInTheDocument()
+
+        expect(spy).toHaveBeenCalledWith('68a06340-c811-4820-bb18-fbe750f24f4a', 1, 3)
     })
 
     it('Delete list', async () => {
