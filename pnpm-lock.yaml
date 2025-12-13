@@ -208,7 +208,7 @@ packages:
     engines: {node: '>=6.9.0'}
 
   '@bbrighter/auth-module@file:../auth-module/bbrighter-auth-module-0.1.1.tgz':
-    resolution: {integrity: sha512-K8kw27dnrp8Zi6dUSVNGW5QfJuSYnkFl70+SQeV1TBq2tg1yAaq9pbuQ32uWezZHoxXlVjwTtBPDUFmnMfMkbQ==, tarball: file:../auth-module/bbrighter-auth-module-0.1.1.tgz}
+    resolution: {integrity: sha512-SUC3WRY+2H20yV+GdoAuTe69dokk1eshPos4hMjpvzlk8pISd+XxIP8SS08PK/osuMWq3HVurRSdrA09v6LGfg==, tarball: file:../auth-module/bbrighter-auth-module-0.1.1.tgz}
     version: 0.1.1
     peerDependencies:
       '@emotion/react': 11.x
