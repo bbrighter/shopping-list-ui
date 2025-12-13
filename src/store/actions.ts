@@ -1,15 +1,16 @@
 import { atom } from 'jotai'
-import { etagAtom, itemsAtom, listIdAtom, productsAtom } from './atoms'
-import { client } from '../api/api'
+import { etagAtom, itemsAtom, listIdAtom, piidAtom, productsAtom } from './atoms'
+import { api } from '../api/api'
 import { respToData, type Product } from './types'
 import { itemAtom } from './selectors'
 import { respToItem, type Item } from './types'
 import { isAPIError } from '../api/generatedApi'
 
 export const fetchDataAtom = atom(null, async (get, set) => {
+    const piid = get(piidAtom)
     try {
         const ifNoneMatch = get(etagAtom)
-        const resp = await client.GetMoments({ IfNoneMatch: ifNoneMatch })
+        const resp = await api.GetMoments(piid, { IfNoneMatch: ifNoneMatch })
         const { listId, items, products, etag } = respToData(resp)
         set(listIdAtom, listId)
         set(itemsAtom, items)
@@ -20,7 +21,7 @@ export const fetchDataAtom = atom(null, async (get, set) => {
             return
         }
         if (isAPIError(error) && error.status == 404) {
-            const resp = await client.PostList()
+            const resp = await api.PostList(piid)
             set(listIdAtom, resp.id)
         }
         // eslint-disable-next-line no-console
@@ -29,38 +30,41 @@ export const fetchDataAtom = atom(null, async (get, set) => {
 
 })
 
-export const createListAtom = atom(null, async (_get, set) => {
-    const resp = await client.PostList()
+export const createListAtom = atom(null, async (get, set) => {
+    const piid = get(piidAtom)
+    const resp = await api.PostList(piid)
     set(listIdAtom, resp.id)
 })
 
 export const checkItemAtom = atom(null, async (get, set, id: number) => {
+    const piid = get(piidAtom)
     const item = get(itemAtom)(id)
     const checkedItem = { ...item, checked: !item.checked }
     const newItems = get(itemsAtom).map(it => it.id == id ? checkedItem : it)
-    await client.CheckItem(id)
+    await api.CheckItem(piid, id)
     set(itemsAtom, newItems)
 })
 
 export const changeItemQuantityAtom = atom(null, async (get, set, id: number, newQuantity?: number) => {
+    const piid = get(piidAtom)
     const item = get(itemAtom)(id)
     const newItem = { ...item, quantity: newQuantity }
     const newItems = get(itemsAtom).map(it => it.id == id ? newItem : it)
-    await client.PatchItem(id, { quantity: newQuantity ?? 0 })
+    await api.PatchItem(piid, id, { quantity: newQuantity ?? 0 })
     set(itemsAtom, newItems)
 })
 
-type PostItemParams = { listId: number, id: number } | { listId: number, name: string }
+type PostItemParams = { piid: string, listId: number, id: number } | { piid: string, listId: number, name: string }
 
 const postItem = async (args: PostItemParams): Promise<{ item: Item, product?: Product }> => {
-    const { listId } = args
+    const { listId, piid } = args
     let item = {} as Item
     let product
     if ('id' in args) {
-        const resp = await client.PostItem(listId, args.id)
+        const resp = await api.PostItem(piid, listId, args.id)
         item = { id: resp.id, checked: false, productId: args.id }
     } else {
-        const resp = await client.PostItemByName(listId, { name: args.name })
+        const resp = await api.PostItemByName(piid, listId, { name: args.name })
         item = respToItem(resp)
         product = { id: item.productId, name: args.name } as Product
     }
@@ -68,7 +72,8 @@ const postItem = async (args: PostItemParams): Promise<{ item: Item, product?: P
 }
 
 export const postItemAtom = atom(null, async (get, set, args: { id: number } | { name: string }) => {
-    const { item, product } = await postItem({ listId: get(listIdAtom), ...args })
+    const piid = get(piidAtom)
+    const { item, product } = await postItem({ piid: piid, listId: get(listIdAtom), ...args })
     if (product) {
         set(productsAtom, [...get(productsAtom), product])
     }
@@ -80,7 +85,8 @@ export const postItemAtom = atom(null, async (get, set, args: { id: number } | {
 })
 
 export const deleteItemAtom = atom(null, async (get, set, id: number) => {
-    await client.DeleteItem(id)
+    const piid = get(piidAtom)
+    await api.DeleteItem(piid, id)
     const newItems = get(itemsAtom).filter(it => it.id != id)
     set(itemsAtom, newItems)
 })
@@ -88,9 +94,10 @@ export const deleteItemAtom = atom(null, async (get, set, id: number) => {
 
 
 export const deleteListAtom = atom(null, async (get, _set, force: boolean) => {
+    const piid = get(piidAtom)
     try {
         const listId = get(listIdAtom)
-        await client.DeleteList(listId, { Force: force })
+        await api.DeleteList(piid, listId, { Force: force })
         return true
     } catch {
         return false

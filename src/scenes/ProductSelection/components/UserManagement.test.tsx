@@ -1,20 +1,14 @@
 import { render, screen } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 import userEvent from '@testing-library/user-event';
-import { AuthProvider, UserManagementProvider } from '@bbrighter/auth-module';
-import { authApi, authClient } from '../../../api/api';
 import App from '../../../App';
 
 describe('user management', () => {
 
+
     it('show and invite users', async () => {
-        render(
-            <AuthProvider api={authApi} productKey='shopping-list'>
-                <UserManagementProvider api={authClient}>
-                    <App />
-                </UserManagementProvider>
-            </AuthProvider>,
-        )
+
+        render(<App />)
 
         const avatar = await screen.findByText('U1')
         await userEvent.click(avatar)

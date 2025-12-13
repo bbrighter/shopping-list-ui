@@ -10,7 +10,7 @@ export const server = setupServer(...handlers)
 
 beforeAll(() => {
     server.listen({ onUnhandledRequest: 'error' })
-    // Uncomment to allow debugging more easily
+    // // Uncomment to allow debugging more easily
     // server.events.on('request:start', ({ request }) => {
     //     console.log('➡️', request.method, request.url)
     //     console.log('   Headers:', Object.fromEntries(request.headers.entries()))

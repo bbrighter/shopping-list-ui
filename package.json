@@ -19,14 +19,13 @@
     "prepare": "husky"
   },
   "dependencies": {
-    "@bbrighter/auth-module": "file:..\\auth-module\\bbrighter-auth-module-0.1.1.tgz",
+    "@bbrighter/auth-module": "file:../auth-module/bbrighter-auth-module-0.1.1.tgz",
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.1",
     "@mui/icons-material": "^7.3.5",
     "@mui/material": "^7.3.5",
     "dependency-cruiser": "^17.3.2",
     "jotai": "^2.15.2",
-    "jotai-location": "^0.6.2",
     "knip": "^5.71.0",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
