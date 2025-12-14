@@ -1,4 +1,4 @@
-import { dispatchUnauthorized } from '@bbrighter/auth-module'
+import { dispatchUnauthorized } from '@bbrighter/auth-module/authentication'
 
 export const fetcher = async (input: RequestInfo | URL, init?: RequestInit) => {
     const resp = await fetch(input, init)

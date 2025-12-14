@@ -11,7 +11,8 @@ import ItemCheckBox from './components/ItemCheckBox'
 import FinishListButton from './components/FinishListButton'
 import Stack from '@mui/material/Stack'
 import usePolling from './hooks/usePolling.ts'
-import { usePiid } from '@bbrighter/auth-module'
+import { usePiid } from '@bbrighter/auth-module/authentication'
+
 
 export default function Home() {
     const piid = usePiid()

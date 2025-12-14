@@ -3,6 +3,7 @@ import { useEffect, useRef } from 'react'
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const usePolling = (callback: () => Promise<void>, interval: number, deps: Array<any>) => {
     const callbackRef = useRef(callback)
+    // eslint-disable-next-line react-hooks/refs
     callbackRef.current = callback
 
     useEffect(() => {

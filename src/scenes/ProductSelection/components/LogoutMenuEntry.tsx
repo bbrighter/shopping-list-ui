@@ -1,4 +1,5 @@
-import { useLogout, useToken } from '@bbrighter/auth-module';
+
+import { useLogout, useToken } from '@bbrighter/auth-module/authentication';
 import Logout from '@mui/icons-material/Logout';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';

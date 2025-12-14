@@ -1,6 +1,8 @@
+import { useUserName } from '@bbrighter/auth-module/authentication';
+import { UserManagement } from '@bbrighter/auth-module/user-management';
 import { Box, MenuItem, Modal } from '@mui/material';
 import { useState } from 'react';
-import { UserManagement, useUserName } from '@bbrighter/auth-module'
+
 
 export default function UserManagementButton() {
     const [open, setOpen] = useState(false)

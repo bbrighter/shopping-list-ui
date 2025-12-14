@@ -3,7 +3,9 @@ import { useState } from 'react';
 import { LogoutMenuEntry } from './LogoutMenuEntry';
 import ProductSelection from './ProductSelection';
 import UserManagement from './UserManagementButton';
-import { UserAvatar, useUserName } from '@bbrighter/auth-module';
+import { useUserName } from '@bbrighter/auth-module/authentication';
+import { UserAvatar } from '@bbrighter/auth-module/user';
+
 
 
 export function ProductMenu() {

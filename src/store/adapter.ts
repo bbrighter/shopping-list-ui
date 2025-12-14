@@ -1,7 +1,8 @@
 import { useAtom, useAtomValue } from 'jotai';
 import { tokenAtom, authApiAtom, userNameAtom, productInstancesAtom, productKeyAtom, usersAtom, userApiAtom, piidAtom } from './atoms';
-import { type AuthStateAdapter, type UserStateAdapter } from '@bbrighter/auth-module'
 import { useLocation as useLocationWouter } from 'wouter';
+import type { AuthStateAdapter } from '@bbrighter/auth-module/authentication';
+import type { UserStateAdapter } from '@bbrighter/auth-module/user-management';
 
 
 export const useAuthStateAdapter = (): AuthStateAdapter => {

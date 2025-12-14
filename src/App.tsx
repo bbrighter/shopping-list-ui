@@ -2,10 +2,12 @@ import { Redirect, Route, Switch, useLocation } from 'wouter'
 import Home from './scenes/Home/Home'
 import { useEffect } from 'react'
 import { ProductSelection } from './scenes/ProductSelection/index.tsx'
-import { useGetPermissions, useToken, useHandleUnauthorized, Login, usePiid, AuthProvider, UserManagementProvider } from '@bbrighter/auth-module'
+
 import { useAuthStateAdapter, useUserManagementAdapter } from './store/adapter.ts'
 import { useAtomValue, useSetAtom } from 'jotai'
 import { authApiAtom, piidAtom } from './store/atoms.ts'
+import { AuthProvider, Login, useGetPermissions, useHandleUnauthorized, usePiid, useToken } from '@bbrighter/auth-module/authentication'
+import { UserManagementProvider } from '@bbrighter/auth-module/user-management'
 
 
 function App() {
@@ -35,6 +37,7 @@ function App() {
 
 export default App
 
+// eslint-disable-next-line no-unused-vars
 const AppEffects = ({ navigate }: { navigate: (_: string) => void }) => {
     useSetPermissions()
     usePiidLocation()

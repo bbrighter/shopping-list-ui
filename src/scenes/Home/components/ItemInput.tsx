@@ -1,7 +1,7 @@
-import Autocomplete from '@mui/material/Autocomplete';
+import Autocomplete, { type AutocompleteChangeReason } from '@mui/material/Autocomplete';
 import TextField from '@mui/material/TextField';
 import { useAtomValue, useSetAtom } from 'jotai';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { postItemAtom, productsNotInUseAtom } from '../../../store';
 
 type Option = {
@@ -13,27 +13,43 @@ export default function ItemInput() {
     const products = useAtomValue(productsNotInUseAtom)
     const addItem = useSetAtom(postItemAtom)
     const [value, setValue] = useState<Option | null>(null)
+    const [inputValue, setInputValue] = useState('')
 
-    const onChange = async (_: React.SyntheticEvent, v: string | Option | null) => {
-        if (typeof (v) == 'string') {
-            setValue({ name: v })
-            return
-        }
-        if (v == null) {
-            return
-        }
-        if (typeof (v) == 'object' && 'name' in v) {
-            setValue(v)
-        }
+    const submitAndReset = async (v: string | Option) => {
+        try {
+            if (typeof (v) == 'string') {
+                await addItem({ name: v })
+            }
+            if (typeof (v) == 'object' && 'id' in v && typeof (v.id) == 'number') {
+                await addItem({ id: v.id })
+            }
+            setValue(null)
+            setInputValue('')
+        } catch { /* empty */ }
     }
 
-    useEffect(() => {
-        if (value != null) {
-            const params = value.id ? { id: value.id } : { name: value.name }
-            addItem(params)
+    const onChange = async (_: React.SyntheticEvent, v: string | Option | null, reason: AutocompleteChangeReason) => {
+        if (v == null) return
+        switch (reason) {
+            case 'selectOption':
+                if (typeof (v) == 'object' && 'id' in v && typeof (v.id) == 'number') {
+                    await submitAndReset(v)
+                }
+                break
+            case 'createOption':
+                if (typeof (v) == 'string') {
+                    await submitAndReset(v)
+                }
+                break
+            case 'clear':
+                setValue(null)
+                setInputValue('')
+                break
+            default:
+                setValue(null)
+                setInputValue('')
         }
-        setValue(null)
-    }, [value])
+    }
 
     return (
         <Autocomplete
@@ -43,6 +59,8 @@ export default function ItemInput() {
             renderInput={params => (<TextField {...params} />)}
             onChange={onChange}
             value={value}
+            inputValue={inputValue}
+            onInputChange={(_, v) => setInputValue(v)}
             clearOnBlur
         />
     )
