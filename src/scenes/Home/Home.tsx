@@ -3,7 +3,6 @@ import { fetchDataAtom, itemsWithNamesAtom } from '../../store'
 import List from '@mui/material/List'
 import ListItem from '@mui/material/ListItem'
 import ListItemText from '@mui/material/ListItemText'
-
 import Container from '@mui/material/Container'
 import ItemInput from './components/ItemInput'
 import ItemSecondaryAction from './components/ItemSecondaryAction'
@@ -11,11 +10,11 @@ import ItemCheckBox from './components/ItemCheckBox'
 import FinishListButton from './components/FinishListButton'
 import Stack from '@mui/material/Stack'
 import usePolling from './hooks/usePolling.ts'
-import { usePiid } from '@bbrighter/auth-module/authentication'
+import { useAuth } from '@bbrighter/auth-module/auth'
 
 
 export default function Home() {
-    const piid = usePiid()
+    const { piid } = useAuth()
     const items = useAtomValue(itemsWithNamesAtom)
     const fetchData = useSetAtom(fetchDataAtom)
 

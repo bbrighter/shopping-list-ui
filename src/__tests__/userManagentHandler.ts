@@ -10,4 +10,6 @@ export const userManagementHandlers = (url: string) => ([
     http.post(url + '/users/:name', () => (HttpResponse.json({
         id: '456',
     } as authentication.UUIDResponse))),
+
+    http.delete(url + '/users/:name', () => (HttpResponse.json({}))),
 ])

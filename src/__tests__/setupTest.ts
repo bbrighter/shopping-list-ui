@@ -1,7 +1,7 @@
 import * as matchers from '@testing-library/jest-dom/matchers';
 import '@testing-library/jest-dom'
 import { setupServer } from 'msw/node'
-import { afterAll, afterEach, beforeAll, beforeEach, expect, vi } from 'vitest';
+import { afterAll, afterEach, beforeAll, beforeEach, expect } from 'vitest';
 import { handlers } from './handler';
 
 expect.extend(matchers);
@@ -17,18 +17,11 @@ beforeAll(() => {
     // })
 })
 beforeEach(() => {
-    vi.mock('@bbrighter/auth-module', async (importOriginal) => {
-        const actual = await importOriginal()
-        return {
-            ...(actual as Record<string, unknown>),
-            usePiid: () => '68a06340-c811-4820-bb18-fbe750f24f4a',
-            piid: () => '68a06340-c811-4820-bb18-fbe750f24f4a',
-            useToken: () => 'abc',
-        }
-    })
+    window.localStorage.setItem('new-token', '123')
 })
 afterEach(() => {
     server.resetHandlers()
     window.localStorage.clear()
+    // vi.clearAllMocks()
 })
 afterAll(() => server.close())
