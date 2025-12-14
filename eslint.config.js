@@ -6,19 +6,20 @@ import tseslint from 'typescript-eslint'
 import { defineConfig, globalIgnores } from 'eslint/config'
 
 export default defineConfig([
-  globalIgnores(['dist']),
+  reactHooks.configs.flat.recommended,
+  tseslint.configs.recommended,
+  reactRefresh.configs.vite,
+  js.configs.recommended,
+  globalIgnores(['dist', '.dependency-cruiser.cjs']),
   {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      js.configs.recommended,
-      tseslint.configs.recommended,
-      reactHooks.configs['recommended-latest'],
-      reactRefresh.configs.vite,
-    ],
     languageOptions: {
       ecmaVersion: 2020,
       globals: globals.browser,
+      parserOptions: {
+        tsconfigRootDir: import.meta.dirname,
+      },
     },
+    files: ['**/*.{ts,tsx}'],
     rules: {
       'quotes': ['error', 'single'],
       'comma-dangle': ['error', 'always-multiline'],
@@ -26,8 +27,9 @@ export default defineConfig([
       'no-console': 'warn',
       'react/react-in-jsx-scope': 'off',
       'react-hooks/exhaustive-deps': 'off',
-      'no-unused-vars': 'warn',
-      '@typescript-eslint/no-unused-vars': ['warn'],
+      'no-undef': 'off',
+      'no-unused-vars': ['warn', { "varsIgnorePattern": "^_" }],
+      '@typescript-eslint/no-unused-vars': ['warn', { "varsIgnorePattern": "^_" }],
     }
   },
 ])

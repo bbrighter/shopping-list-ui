@@ -1,8 +1,5 @@
-/* eslint-disable no-unused-vars */
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import Client, { Environment, Local, type ClientOptions } from './generatedApi';
 import { fetcher } from './fetcher';
-
 
 
 const getStageURL = (): string => {
@@ -29,39 +26,4 @@ const options: ClientOptions = {
 
 const baseClient = new Client(baseUrl, options)
 export const authApi = baseClient.authentication
-
-
-
-
-type DropFirstArg<F> = F extends (first: any, ...rest: infer R) => infer Ret
-    ? (...args: R) => Ret
-    : F
-
-type PiidInjectedClient<T> = {
-    [K in keyof T]: DropFirstArg<T[K]>
-}
-
-
-let getPiid: (() => string | null) | null = null
-export const injectPiidGetter = (getter: () => string | null) => {
-    getPiid = getter
-}
-
-
-export const client: PiidInjectedClient<typeof baseClient.shoppinglist> = new Proxy(baseClient.shoppinglist, {
-    get(target, prop, receiver) {
-        const orig = Reflect.get(target, prop, receiver)
-
-        if (typeof orig !== 'function') {
-            return orig
-        }
-
-        return (...args: any[]) => {
-            const piid = getPiid?.()
-            if (!piid) {
-                return
-            }
-            return orig.call(target, piid, ...args)
-        }
-    },
-}) as any
+export const api = baseClient.shoppinglist

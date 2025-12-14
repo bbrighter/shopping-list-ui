@@ -14,6 +14,7 @@ export default defineConfig({
     setupFiles: 'src/__tests__/setupTest.ts',
     coverage: {
       provider: 'v8',
+      exclude: ['api/generatedApi.ts'],
     },
   },
 })

@@ -1,77 +1,75 @@
-import { Route, Switch, useLocation } from 'wouter'
-import Login from './scenes/Login/Login'
+import { Redirect, Route, Switch, useLocation } from 'wouter'
 import Home from './scenes/Home/Home'
-import { useAtomValue, useSetAtom } from 'jotai'
 import { useEffect } from 'react'
-import { getPermissionsAtom, piidAtom, tokenAtom } from './store/authStore/index.ts'
 import { ProductSelection } from './scenes/ProductSelection/index.tsx'
-import { AUTH_EVENT_NAME } from './api/fetcher.ts'
 
+import { useAuthStateAdapter, useUserManagementAdapter } from './store/adapter.ts'
+import { useAtomValue, useSetAtom } from 'jotai'
+import { authApiAtom, piidAtom } from './store/atoms.ts'
+import { AuthProvider, Login, useGetPermissions, useHandleUnauthorized, usePiid, useToken } from '@bbrighter/auth-module/authentication'
+import { UserManagementProvider } from '@bbrighter/auth-module/user-management'
 
 
 function App() {
-    useSetPermissions()
-    usePiidLocation()
-    useHandleUnauthorized()
+    const [_, navigate] = useLocation()
+
+    const authStateAdpater = useAuthStateAdapter()
+    const userManagementAdapter = useUserManagementAdapter()
+
+    if (!authStateAdpater || !userManagementAdapter) return
 
     return (
-        <>
-            <ProductSelection />
-            <Switch>
-                <Route path={'/login'} component={Login} />
-                <Route path={'/:piid'} component={Home} />
-                <Route>404, Not Found!</Route>
-            </Switch>
-        </>
+        <AuthProvider adapter={authStateAdpater}>
+            <UserManagementProvider adapter={userManagementAdapter}>
+                <AppEffects navigate={navigate} />
+                <ProductSelection />
+                <Switch>
+                    <Route path={'/login'} component={Login} />
+                    <Route path={'/:piid'} component={Home} />
+                    <Route>
+                        <Redirect to='/login' />
+                    </Route>
+                </Switch>
+            </UserManagementProvider>
+        </AuthProvider>
     )
 }
 
 export default App
 
+// eslint-disable-next-line no-unused-vars
+const AppEffects = ({ navigate }: { navigate: (_: string) => void }) => {
+    useSetPermissions()
+    usePiidLocation()
+    useHandleUnauthorized(navigate)
+    return null
+}
 
 const useSetPermissions = () => {
-    const piid = useAtomValue(piidAtom)
-    const token = useAtomValue(tokenAtom)
-    const getPermissions = useSetAtom(getPermissionsAtom)
+    const getPermissions = useGetPermissions()
+    const api = useAtomValue(authApiAtom)
 
+    const token = useToken()
     useEffect(() => {
         getPermissions()
-    }, [piid, token])
+    }, [token, api])
 }
 
 
 const usePiidLocation = () => {
-    const piid = useAtomValue(piidAtom)
+    const piid = usePiid()
+    const setPiid = useSetAtom(piidAtom)
+    const api = useAtomValue(authApiAtom)
+    const [, navigate] = useLocation()
 
-    const [, navigate] = useLocation();
     useEffect(() => {
         if (piid) {
+            setPiid(piid)
             navigate(`/${piid}`, {
                 replace: true,
             })
         }
-    }, [piid])
+    }, [piid, api])
 }
 
 
-const useHandleUnauthorized = () => {
-    const [, navigate] = useLocation();
-
-    useEffect(() => {
-        const onUnauthorized = (e: Event) => {
-            const path = (e as CustomEvent).detail as string
-
-            if (!path) return
-
-            if (path.includes('login')) return
-
-            const guidRegex = /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/
-            const match = path.match(guidRegex)
-            const redirectPath = match ? `/login?piid=${match}` : '/login'
-            navigate(redirectPath)
-        }
-
-        window.addEventListener(AUTH_EVENT_NAME, onUnauthorized)
-        return () => window.removeEventListener(AUTH_EVENT_NAME, onUnauthorized)
-    }, [])
-}

@@ -1,19 +1,17 @@
 import { render, screen } from '@testing-library/react';
-import { beforeEach, describe, expect, it } from 'vitest';
-import UserManagement from './UserManagement';
+import { describe, expect, it } from 'vitest';
 import userEvent from '@testing-library/user-event';
-import { getDefaultStore } from 'jotai';
-import { getPermissionsAtom } from '../../../store/authStore';
+import App from '../../../App';
 
 describe('user management', () => {
-    beforeEach(() => {
-        const store = getDefaultStore()
-        store.set(getPermissionsAtom)
-    })
+
 
     it('show and invite users', async () => {
-        render(<UserManagement />)
 
+        render(<App />)
+
+        const avatar = await screen.findByText('U1')
+        await userEvent.click(avatar)
         const userMenuButton = await screen.findByText('Benutzer')
         await userEvent.click(userMenuButton)
 

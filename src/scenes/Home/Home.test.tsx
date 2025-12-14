@@ -2,7 +2,11 @@ import { describe, expect, it, vi } from 'vitest';
 import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import Home from './Home';
-import { client } from '../../api/api';
+import { api } from '../../api/api';
+import { useHydrateAtoms } from 'jotai/utils'
+import { Provider } from 'jotai';
+import { piidAtom } from '../../store';
+import type { ReactNode } from 'react';
 
 const findListItem = async (name: string) => {
     const prod = await screen.findByText(name)
@@ -12,16 +16,37 @@ const findListItem = async (name: string) => {
     return listItem!
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const HydrateAtoms = ({ initialValues, children }: { initialValues: any, children: ReactNode }) => {
+    useHydrateAtoms(initialValues)
+    return children
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const TestProvider = ({ initialValues, children }: { initialValues: any, children: ReactNode }) => (
+    <Provider>
+        <HydrateAtoms initialValues={initialValues}>{children}</HydrateAtoms>
+    </Provider>
+)
+
+const HomeProvider = () => {
+    return (
+        <TestProvider initialValues={[[piidAtom, '68a06340-c811-4820-bb18-fbe750f24f4a']]}>
+            <Home />
+        </TestProvider>
+    )
+}
+
 describe('home page', () => {
     it('Renders', async () => {
-        render(<Home />)
+        render(<HomeProvider />)
 
         const listItem1 = await findListItem('prod1')
         expect(within(listItem1).getByText('3')).toBeInTheDocument()
     })
 
     it('Check and uncheck', async () => {
-        render(<Home />)
+        render(<HomeProvider />)
 
         const listItem1 = await findListItem('prod1')
         const checkboxProd1 = within(listItem1).getByRole('checkbox')
@@ -45,7 +70,7 @@ describe('home page', () => {
     })
 
     it('Edit quantity', async () => {
-        render(<Home />)
+        render(<HomeProvider />)
 
         const listItem1 = await findListItem('prod1')
         expect(within(listItem1).getByText('3')).toBeInTheDocument()
@@ -62,7 +87,7 @@ describe('home page', () => {
     })
 
     it('Delete', async () => {
-        render(<Home />)
+        render(<HomeProvider />)
 
         const listItem1 = await findListItem('prod1')
         const deleteButton = within(listItem1).getByTestId('deleteItem')
@@ -75,13 +100,40 @@ describe('home page', () => {
 
     })
 
-    it('Create new', { skip: true }, async () => {
-        render(<Home />)
+    it('Create new item by name', async () => {
+        const spy = vi.spyOn(api, 'PostItemByName')
+        render(<HomeProvider />)
+
+        const combobox = await screen.findByRole('combobox')
+        await userEvent.type(combobox, 'new item{enter}')
+
+        const newItem = await screen.findByText('new item')
+        expect(newItem).toBeInTheDocument()
+        expect(newItem.closest('li')).toBeInTheDocument()
+
+        expect(spy).toHaveBeenCalledWith('68a06340-c811-4820-bb18-fbe750f24f4a', 1, { name: 'new item' })
+    })
+
+    it('Create item based on existing product', async () => {
+        const spy = vi.spyOn(api, 'PostItem')
+        render(<HomeProvider />)
+
+        const combobox = await screen.findByRole('combobox')
+        await userEvent.type(combobox, 'prod')
+        const option = screen.getByText('prod3')
+        await userEvent.click(option)
+
+
+        const newItem = await screen.findByText('prod3')
+        expect(newItem).toBeInTheDocument()
+        expect(newItem.closest('li')).toBeInTheDocument()
+
+        expect(spy).toHaveBeenCalledWith('68a06340-c811-4820-bb18-fbe750f24f4a', 1, 3)
     })
 
     it('Delete list', async () => {
-        const spy = vi.spyOn(client, 'PostList')
-        render(<Home />)
+        const spy = vi.spyOn(api, 'PostList')
+        render(<HomeProvider />)
 
         const finishListButton = await screen.findByText('Liste abschließen')
         await userEvent.click(finishListButton)
@@ -105,7 +157,7 @@ describe('home page', () => {
     })
 
     it('patch quantity', async () => {
-        render(<Home />)
+        render(<HomeProvider />)
 
         const listItem2 = await findListItem('prod2')
         const plusButton = within(listItem2).getByText('+')
