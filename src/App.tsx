@@ -1,16 +1,16 @@
 import { Redirect, Route, Switch, useLocation } from 'wouter'
 import Home from './scenes/Home/Home'
 import { useEffect } from 'react'
-import { ProductSelection } from './scenes/ProductSelection/index.tsx'
-
 import { useAuthStateAdapter, useUserManagementAdapter } from './store/adapter.ts'
 import { useAtomValue, useSetAtom } from 'jotai'
 import { authApiAtom, piidAtom } from './store/atoms.ts'
-import { AuthProvider, Login, useGetPermissions, useHandleUnauthorized, usePiid, useToken } from '@bbrighter/auth-module/authentication'
-import { UserManagementProvider } from '@bbrighter/auth-module/user-management'
+import { AuthProvider, useAuth, useHandleUnauthorized } from '@bbrighter/auth-module/auth'
+import { Login } from '@bbrighter/auth-module/login'
+import { UserManagementProvider } from '@bbrighter/auth-module/users'
+import { CustomAppBar } from '@bbrighter/auth-module/app-bar'
 
 
-function App() {
+export default function App() {
     const [_, navigate] = useLocation()
 
     const authStateAdpater = useAuthStateAdapter()
@@ -22,7 +22,7 @@ function App() {
         <AuthProvider adapter={authStateAdpater}>
             <UserManagementProvider adapter={userManagementAdapter}>
                 <AppEffects navigate={navigate} />
-                <ProductSelection />
+                <CustomAppBar />
                 <Switch>
                     <Route path={'/login'} component={Login} />
                     <Route path={'/:piid'} component={Home} />
@@ -35,8 +35,6 @@ function App() {
     )
 }
 
-export default App
-
 // eslint-disable-next-line no-unused-vars
 const AppEffects = ({ navigate }: { navigate: (_: string) => void }) => {
     useSetPermissions()
@@ -46,18 +44,17 @@ const AppEffects = ({ navigate }: { navigate: (_: string) => void }) => {
 }
 
 const useSetPermissions = () => {
-    const getPermissions = useGetPermissions()
+    const { setPermissions, token } = useAuth()
     const api = useAtomValue(authApiAtom)
 
-    const token = useToken()
     useEffect(() => {
-        getPermissions()
+        setPermissions()
     }, [token, api])
 }
 
 
 const usePiidLocation = () => {
-    const piid = usePiid()
+    const { piid } = useAuth()
     const setPiid = useSetAtom(piidAtom)
     const api = useAtomValue(authApiAtom)
     const [, navigate] = useLocation()
