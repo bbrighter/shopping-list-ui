@@ -6,19 +6,24 @@ import type { UserStateAdapter } from '@bbrighter/auth-module/users';
 
 
 export const useAuthStateAdapter = (): AuthStateAdapter => {
-    const useToken = () => (useAtom(tokenAtom))
-    const useAuthApi = () => (useAtom(authApiAtom))
-    const useUserName = () => (useAtom(userNameAtom))
-    const useProductInstances = () => (useAtom(productInstancesAtom))
-    const useProductKey = () => (useAtom(productKeyAtom))
-    const useLocation = () => (useLocationWouter())
+    const [token, setToken] =  useAtom(tokenAtom)
+    const useToken = () => ({ token, setToken })
+    const useAuthApi = () => (useAtomValue(authApiAtom))
+    const [userName, setUserName] = useAtom(userNameAtom)
+    const useUserName = () => ({ userName, setUserName })
+    const [instances, setInstances] = useAtom(productInstancesAtom)
+    const useProductInstances = () => ({  instances, setInstances })
+    const useProductKey = () => (useAtomValue(productKeyAtom))
+    const [location, navigate] = useLocationWouter()
+    const useLocation = () => ({ location, navigate })
 
     return { useToken, useAuthApi, useUserName, useProductInstances, useProductKey, useLocation }
 }
 
 
 export const useUserManagementAdapter = (): UserStateAdapter => {
-    const useUsers = () => (useAtom(usersAtom))
+    const [users, setUsers] = useAtom(usersAtom)
+    const useUsers = () => ({ users, setUsers })
     const useApi = () => (useAtomValue(userApiAtom))
     const usePiid = () => (useAtomValue(piidAtom))
 
