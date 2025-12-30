@@ -1,181 +1,179 @@
-import { describe, expect, it, vi } from 'vitest';
-import { render, screen, waitFor, within } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
-import Home from './Home';
-import { api } from '../../api/api';
+import { render, screen, waitFor, within } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
+import { Provider } from 'jotai'
 import { useHydrateAtoms } from 'jotai/utils'
-import { Provider } from 'jotai';
-import { piidAtom } from '../../store';
-import type { ReactNode } from 'react';
+import type { ReactNode } from 'react'
+import { describe, expect, it, vi } from 'vitest'
+
+import { api } from '../../api/api'
+import { piidAtom } from '../../store'
+import Home from './Home'
 
 const findListItem = async (name: string) => {
-    const prod = await screen.findByText(name)
-    expect(prod).toBeInTheDocument()
-    const listItem = prod.closest('li')
-    expect(listItem).toBeInTheDocument()
-    return listItem!
+  const prod = await screen.findByText(name)
+  expect(prod).toBeInTheDocument()
+  const listItem = prod.closest('li')
+  expect(listItem).toBeInTheDocument()
+  return listItem!
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const HydrateAtoms = ({ initialValues, children }: { initialValues: any, children: ReactNode }) => {
-    useHydrateAtoms(initialValues)
-    return children
+  useHydrateAtoms(initialValues)
+  return children
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const TestProvider = ({ initialValues, children }: { initialValues: any, children: ReactNode }) => (
-    <Provider>
-        <HydrateAtoms initialValues={initialValues}>{children}</HydrateAtoms>
-    </Provider>
+  <Provider>
+    <HydrateAtoms initialValues={initialValues}>{children}</HydrateAtoms>
+  </Provider>
 )
 
 const HomeProvider = () => {
-    return (
-        <TestProvider initialValues={[[piidAtom, '68a06340-c811-4820-bb18-fbe750f24f4a']]}>
-            <Home />
-        </TestProvider>
-    )
+  return (
+    <TestProvider initialValues={[[piidAtom, '68a06340-c811-4820-bb18-fbe750f24f4a']]}>
+      <Home />
+    </TestProvider>
+  )
 }
 
 describe('home page', () => {
-    it('Renders', async () => {
-        render(<HomeProvider />)
+  it('Renders', async () => {
+    render(<HomeProvider />)
 
-        const listItem1 = await findListItem('prod1')
-        expect(within(listItem1).getByText('3')).toBeInTheDocument()
+    const listItem1 = await findListItem('prod1')
+    expect(within(listItem1).getByText('3')).toBeInTheDocument()
+  })
+
+  it('Check and uncheck', async () => {
+    render(<HomeProvider />)
+
+    const listItem1 = await findListItem('prod1')
+    const checkboxProd1 = within(listItem1).getByRole('checkbox')
+    expect(checkboxProd1).toBeInTheDocument()
+    expect(checkboxProd1).not.toBeChecked()
+
+    const listItem2 = await findListItem('prod2')
+    const checkboxProd2 = within(listItem2).getByRole('checkbox')
+    expect(checkboxProd2).toBeInTheDocument()
+    expect(checkboxProd2).toBeChecked()
+
+    await waitFor(() => {
+      userEvent.click(checkboxProd2)
+      expect(checkboxProd2).not.toBeChecked()
     })
 
-    it('Check and uncheck', async () => {
-        render(<HomeProvider />)
+    await waitFor(() => {
+      userEvent.click(checkboxProd2)
+      expect(checkboxProd2).toBeChecked()
+    })
+  })
 
-        const listItem1 = await findListItem('prod1')
-        const checkboxProd1 = within(listItem1).getByRole('checkbox')
-        expect(checkboxProd1).toBeInTheDocument()
-        expect(checkboxProd1).not.toBeChecked()
+  it('Edit quantity', async () => {
+    render(<HomeProvider />)
 
-        const listItem2 = await findListItem('prod2')
-        const checkboxProd2 = within(listItem2).getByRole('checkbox')
-        expect(checkboxProd2).toBeInTheDocument()
-        expect(checkboxProd2).toBeChecked()
+    const listItem1 = await findListItem('prod1')
+    expect(within(listItem1).getByText('3')).toBeInTheDocument()
 
-        await waitFor(() => {
-            userEvent.click(checkboxProd2)
-            expect(checkboxProd2).not.toBeChecked()
-        })
+    const increaseButton = within(listItem1).getByTestId('increaseItemQuantity')
+    expect(increaseButton).toBeInTheDocument()
+    await userEvent.click(increaseButton)
+    expect(within(listItem1).getByText('4')).toBeInTheDocument()
 
-        await waitFor(() => {
-            userEvent.click(checkboxProd2)
-            expect(checkboxProd2).toBeChecked()
-        })
+    const decreaseButton = within(listItem1).getByTestId('decreaseItemQuantity')
+    expect(decreaseButton).toBeInTheDocument()
+    await userEvent.click(decreaseButton)
+    expect(within(listItem1).getByText('3')).toBeInTheDocument()
+  })
+
+  it('Delete', async () => {
+    render(<HomeProvider />)
+
+    const listItem1 = await findListItem('prod1')
+    const deleteButton = within(listItem1).getByTestId('deleteItem')
+
+    await waitFor(async () => {
+      await userEvent.click(deleteButton)
+      expect(screen.queryByText('prod1')).not.toBeInTheDocument()
+      expect(screen.getByText('prod2')).toBeInTheDocument()
+    })
+  })
+
+  it('Create new item by name', async () => {
+    const spy = vi.spyOn(api, 'PostItemByName')
+    render(<HomeProvider />)
+
+    const combobox = await screen.findByRole('combobox')
+    await userEvent.type(combobox, 'new item{enter}')
+
+    const newItem = await screen.findByText('new item')
+    expect(newItem).toBeInTheDocument()
+    expect(newItem.closest('li')).toBeInTheDocument()
+
+    expect(spy).toHaveBeenCalledWith('68a06340-c811-4820-bb18-fbe750f24f4a', 1, { name: 'new item' })
+  })
+
+  it('Create item based on existing product', async () => {
+    const spy = vi.spyOn(api, 'PostItem')
+    render(<HomeProvider />)
+
+    const combobox = await screen.findByRole('combobox')
+    await userEvent.type(combobox, 'prod')
+    const option = screen.getByText('prod3')
+    await userEvent.click(option)
+
+    const newItem = await screen.findByText('prod3')
+    expect(newItem).toBeInTheDocument()
+    expect(newItem.closest('li')).toBeInTheDocument()
+
+    expect(spy).toHaveBeenCalledWith('68a06340-c811-4820-bb18-fbe750f24f4a', 1, 3)
+  })
+
+  it('Delete list', async () => {
+    const spy = vi.spyOn(api, 'PostList')
+    render(<HomeProvider />)
+
+    const finishListButton = await screen.findByText('Liste abschließen')
+    await userEvent.click(finishListButton)
+
+    expect(await screen.findByText('Liste löschen nicht möglich')).toBeInTheDocument()
+    const keepButton = screen.getByText('Behalten')
+
+    await waitFor(() => {
+      userEvent.click(keepButton)
+      expect(screen.queryByText('Liste löschen nicht möglich')).not.toBeInTheDocument()
     })
 
-    it('Edit quantity', async () => {
-        render(<HomeProvider />)
+    await userEvent.click(finishListButton)
+    const deleteButton = await screen.findByText('Dennoch löschen')
+    await userEvent.click(deleteButton)
 
-        const listItem1 = await findListItem('prod1')
-        expect(within(listItem1).getByText('3')).toBeInTheDocument()
+    await waitFor(() => {
+      expect(screen.queryByText('Liste löschen nicht möglich')).not.toBeInTheDocument()
+      expect(spy).toHaveBeenCalledOnce()
+    })
+  })
 
-        const increaseButton = within(listItem1).getByTestId('increaseItemQuantity')
-        expect(increaseButton).toBeInTheDocument()
-        await userEvent.click(increaseButton)
-        expect(within(listItem1).getByText('4')).toBeInTheDocument()
+  it('patch quantity', async () => {
+    render(<HomeProvider />)
 
-        const decreaseButton = within(listItem1).getByTestId('decreaseItemQuantity')
-        expect(decreaseButton).toBeInTheDocument()
-        await userEvent.click(decreaseButton)
-        expect(within(listItem1).getByText('3')).toBeInTheDocument()
+    const listItem2 = await findListItem('prod2')
+    const plusButton = within(listItem2).getByText('+')
+    expect(plusButton).toBeInTheDocument()
+    const minusButton = within(listItem2).getByText('-')
+    expect(minusButton).toBeInTheDocument()
+    expect(minusButton).toBeDisabled()
+
+    await waitFor(() => {
+      userEvent.click(plusButton)
+      expect(within(listItem2).getByText('1')).toBeInTheDocument()
     })
 
-    it('Delete', async () => {
-        render(<HomeProvider />)
-
-        const listItem1 = await findListItem('prod1')
-        const deleteButton = within(listItem1).getByTestId('deleteItem')
-
-        await waitFor(async () => {
-            await userEvent.click(deleteButton)
-            expect(screen.queryByText('prod1')).not.toBeInTheDocument()
-            expect(screen.getByText('prod2')).toBeInTheDocument()
-        })
-
+    await waitFor(() => {
+      expect(minusButton).not.toBeDisabled()
+      userEvent.click(minusButton)
+      expect(within(listItem2).queryByText('1')).not.toBeInTheDocument()
     })
-
-    it('Create new item by name', async () => {
-        const spy = vi.spyOn(api, 'PostItemByName')
-        render(<HomeProvider />)
-
-        const combobox = await screen.findByRole('combobox')
-        await userEvent.type(combobox, 'new item{enter}')
-
-        const newItem = await screen.findByText('new item')
-        expect(newItem).toBeInTheDocument()
-        expect(newItem.closest('li')).toBeInTheDocument()
-
-        expect(spy).toHaveBeenCalledWith('68a06340-c811-4820-bb18-fbe750f24f4a', 1, { name: 'new item' })
-    })
-
-    it('Create item based on existing product', async () => {
-        const spy = vi.spyOn(api, 'PostItem')
-        render(<HomeProvider />)
-
-        const combobox = await screen.findByRole('combobox')
-        await userEvent.type(combobox, 'prod')
-        const option = screen.getByText('prod3')
-        await userEvent.click(option)
-
-
-        const newItem = await screen.findByText('prod3')
-        expect(newItem).toBeInTheDocument()
-        expect(newItem.closest('li')).toBeInTheDocument()
-
-        expect(spy).toHaveBeenCalledWith('68a06340-c811-4820-bb18-fbe750f24f4a', 1, 3)
-    })
-
-    it('Delete list', async () => {
-        const spy = vi.spyOn(api, 'PostList')
-        render(<HomeProvider />)
-
-        const finishListButton = await screen.findByText('Liste abschließen')
-        await userEvent.click(finishListButton)
-
-        expect(await screen.findByText('Liste löschen nicht möglich')).toBeInTheDocument()
-        const keepButton = screen.getByText('Behalten')
-
-        await waitFor(() => {
-            userEvent.click(keepButton)
-            expect(screen.queryByText('Liste löschen nicht möglich')).not.toBeInTheDocument()
-        })
-
-        await userEvent.click(finishListButton)
-        const deleteButton = await screen.findByText('Dennoch löschen')
-        await userEvent.click(deleteButton)
-
-        await waitFor(() => {
-            expect(screen.queryByText('Liste löschen nicht möglich')).not.toBeInTheDocument()
-            expect(spy).toHaveBeenCalledOnce()
-        })
-    })
-
-    it('patch quantity', async () => {
-        render(<HomeProvider />)
-
-        const listItem2 = await findListItem('prod2')
-        const plusButton = within(listItem2).getByText('+')
-        expect(plusButton).toBeInTheDocument()
-        const minusButton = within(listItem2).getByText('-')
-        expect(minusButton).toBeInTheDocument()
-        expect(minusButton).toBeDisabled()
-
-        await waitFor(() => {
-            userEvent.click(plusButton)
-            expect(within(listItem2).getByText('1')).toBeInTheDocument()
-        })
-
-
-        await waitFor(() => {
-            expect(minusButton).not.toBeDisabled()
-            userEvent.click(minusButton)
-            expect(within(listItem2).queryByText('1')).not.toBeInTheDocument()
-        })
-    })
+  })
 })

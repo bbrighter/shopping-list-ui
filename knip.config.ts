@@ -8,6 +8,6 @@ const config: KnipConfig = {
     'dot', // Needed to visualize results from dependency-cruiser
   ],
 
-};
+}
 
-export default config;
+export default config

@@ -1,5 +1,5 @@
 export * from './actions'
+export * from './adapter'
 export * from './atoms'
 export * from './selectors'
 export * from './types'
-export * from './adapter'

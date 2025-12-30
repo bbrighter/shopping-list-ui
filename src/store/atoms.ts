@@ -1,28 +1,29 @@
-import { atom } from 'jotai'
-import type { Item, Product } from './types'
-import { authApi } from '../api/api'
-import { atomWithStorage } from 'jotai/utils'
 import type { AuthApi } from '@bbrighter/auth-module/auth'
 import type { UserAPI } from '@bbrighter/auth-module/users'
+import { atom } from 'jotai'
+import { atomWithStorage } from 'jotai/utils'
+
+import { authApi } from '../api/api'
+import type { Item, Product } from './types'
 
 type ProductKey = 'shopping-list' | 'hista-complete'
 
 type ProductInstance = {
-    id: string
-    productName: string
-    productId: string
-    url: string
+  id: string
+  productName: string
+  productId: string
+  url: string
 }
 
 type User = {
-    id: string
-    name: string
+  id: string
+  name: string
 }
 
 const storage = {
-    getItem: (key: string, initialVal: string) => { return window.localStorage.getItem(key) || initialVal },
-    setItem: (key: string, val: string) => { window.localStorage.setItem(key, val) },
-    removeItem: (key: string) => { window.localStorage.removeItem(key) },
+  getItem: (key: string, initialVal: string) => { return window.localStorage.getItem(key) || initialVal },
+  setItem: (key: string, val: string) => { window.localStorage.setItem(key, val) },
+  removeItem: (key: string) => { window.localStorage.removeItem(key) },
 }
 
 export const piidAtom = atom('')

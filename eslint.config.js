@@ -1,35 +1,38 @@
-import js from '@eslint/js'
+import jseslint from '@eslint/js'
+import stylistic from '@stylistic/eslint-plugin'
+import { defineConfig } from 'eslint/config'
+import pluginReact from 'eslint-plugin-react'
+import reactCompiler from 'eslint-plugin-react-compiler'
+import simpleImportSort from 'eslint-plugin-simple-import-sort'
 import globals from 'globals'
-import reactHooks from 'eslint-plugin-react-hooks'
-import reactRefresh from 'eslint-plugin-react-refresh'
 import tseslint from 'typescript-eslint'
-import { defineConfig, globalIgnores } from 'eslint/config'
 
 export default defineConfig([
-  reactHooks.configs.flat.recommended,
+  jseslint.configs.recommended,
   tseslint.configs.recommended,
-  reactRefresh.configs.vite,
-  js.configs.recommended,
-  globalIgnores(['dist', '.dependency-cruiser.cjs']),
+  stylistic.configs.recommended,
+  reactCompiler.configs.recommended,
   {
+    files: ['**/*.{js,mjs,cjs,ts,jsx,tsx}'],
     languageOptions: {
-      ecmaVersion: 2020,
       globals: globals.browser,
-      parserOptions: {
-        tsconfigRootDir: import.meta.dirname,
-      },
     },
-    files: ['**/*.{ts,tsx}'],
+    plugins: {
+      'react': pluginReact,
+      'simple-import-sort': simpleImportSort,
+    },
     rules: {
       'quotes': ['error', 'single'],
       'comma-dangle': ['error', 'always-multiline'],
       'object-curly-spacing': ['error', 'always'],
       'no-console': 'warn',
       'react/react-in-jsx-scope': 'off',
-      'react-hooks/exhaustive-deps': 'off',
-      'no-undef': 'off',
-      'no-unused-vars': ['warn', { "varsIgnorePattern": "^_" }],
-      '@typescript-eslint/no-unused-vars': ['warn', { "varsIgnorePattern": "^_" }],
-    }
+      'react/prop-types': 'off',
+      'simple-import-sort/imports': 'warn',
+      'simple-import-sort/exports': 'error',
+      'indent': 'off',
+      // '@stylistic/indent': 'off',
+      '@typescript-eslint/no-unused-vars': 'off',
+    },
   },
 ])
