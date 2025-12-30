@@ -1,10 +1,11 @@
 import { atom } from 'jotai'
-import { etagAtom, itemsAtom, listIdAtom, piidAtom, productsAtom } from './atoms'
+
 import { api } from '../api/api'
-import { respToData, type Product } from './types'
-import { itemAtom } from './selectors'
-import { respToItem, type Item } from './types'
 import { isAPIError } from '../api/generatedApi'
+import { etagAtom, itemsAtom, listIdAtom, piidAtom, productsAtom } from './atoms'
+import { itemAtom } from './selectors'
+import { type Product, respToData } from './types'
+import { type Item, respToItem } from './types'
 
 export const fetchDataAtom = atom(null, async (get, set) => {
     const piid = get(piidAtom)
@@ -16,18 +17,19 @@ export const fetchDataAtom = atom(null, async (get, set) => {
         set(itemsAtom, items)
         set(productsAtom, products)
         set(etagAtom, etag)
-    } catch (error) {
+    }
+    catch (error) {
         if (isAPIError(error) && error.status == 304) {
             return
         }
         if (isAPIError(error) && error.status == 404) {
             const resp = await api.PostList(piid)
             set(listIdAtom, resp.id)
+            return
         }
         // eslint-disable-next-line no-console
         console.error('catch:', error)
     }
-
 })
 
 export const createListAtom = atom(null, async (get, set) => {
@@ -63,7 +65,8 @@ const postItem = async (args: PostItemParams): Promise<{ item: Item, product?: P
     if ('id' in args) {
         const resp = await api.PostItem(piid, listId, args.id)
         item = { id: resp.id, checked: false, productId: args.id }
-    } else {
+    }
+    else {
         const resp = await api.PostItemByName(piid, listId, { name: args.name })
         item = respToItem(resp)
         product = { id: item.productId, name: args.name } as Product
@@ -81,7 +84,6 @@ export const postItemAtom = atom(null, async (get, set, args: { id: number } | {
     item.productName = itemProductName
     const newItems = [...get(itemsAtom), item]
     set(itemsAtom, newItems)
-
 })
 
 export const deleteItemAtom = atom(null, async (get, set, id: number) => {
@@ -91,16 +93,14 @@ export const deleteItemAtom = atom(null, async (get, set, id: number) => {
     set(itemsAtom, newItems)
 })
 
-
-
 export const deleteListAtom = atom(null, async (get, _set, force: boolean) => {
     const piid = get(piidAtom)
     try {
         const listId = get(listIdAtom)
         await api.DeleteList(piid, listId, { Force: force })
         return true
-    } catch {
+    }
+    catch {
         return false
     }
-
 })

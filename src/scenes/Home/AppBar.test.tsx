@@ -1,7 +1,8 @@
-import { render, screen, within } from '@testing-library/react';
-import { describe, expect, it } from 'vitest';
-import App from '../../App';
-import userEvent from '@testing-library/user-event';
+import { render, screen, within } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
+import { describe, expect, it } from 'vitest'
+
+import App from '../../App'
 
 describe('app bar works with api', () => {
     it('renders', async () => {
@@ -53,7 +54,6 @@ describe('app bar works with api', () => {
         const logoutButton = screen.getByText('Logout').closest('li')!
         expect(logoutButton).toHaveAttribute('aria-disabled', 'true')
     })
-
 
     it('Logout', async () => {
         render(<App />)

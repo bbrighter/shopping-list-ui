@@ -1,15 +1,16 @@
-import Autocomplete, { type AutocompleteChangeReason } from '@mui/material/Autocomplete';
-import TextField from '@mui/material/TextField';
-import { useAtomValue, useSetAtom } from 'jotai';
-import { useState } from 'react';
-import { postItemAtom, productsNotInUseAtom } from '../../../store';
+import Autocomplete, { type AutocompleteChangeReason } from '@mui/material/Autocomplete'
+import TextField from '@mui/material/TextField'
+import { useAtomValue, useSetAtom } from 'jotai'
+import { useState } from 'react'
+
+import { postItemAtom, productsNotInUseAtom } from '../../../store'
 
 type Option = {
     id?: number
     name: string
 }
 
-export default function ItemInput() {
+export function ItemInput() {
     const products = useAtomValue(productsNotInUseAtom)
     const addItem = useSetAtom(postItemAtom)
     const [value, setValue] = useState<Option | null>(null)
@@ -25,7 +26,8 @@ export default function ItemInput() {
             }
             setValue(null)
             setInputValue('')
-        } catch { /* empty */ }
+        }
+        catch { /* empty */ }
     }
 
     const onChange = async (_: React.SyntheticEvent, v: string | Option | null, reason: AutocompleteChangeReason) => {
@@ -55,7 +57,7 @@ export default function ItemInput() {
         <Autocomplete
             freeSolo
             options={products}
-            getOptionLabel={(o) => typeof (o) == 'string' ? o : o.name}
+            getOptionLabel={o => typeof (o) == 'string' ? o : o.name}
             renderInput={params => (<TextField {...params} />)}
             onChange={onChange}
             value={value}

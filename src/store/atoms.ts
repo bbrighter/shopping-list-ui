@@ -1,9 +1,10 @@
-import { atom } from 'jotai'
-import type { Item, Product } from './types'
-import { authApi } from '../api/api'
-import { atomWithStorage } from 'jotai/utils'
 import type { AuthApi } from '@bbrighter/auth-module/auth'
 import type { UserAPI } from '@bbrighter/auth-module/users'
+import { atom } from 'jotai'
+import { atomWithStorage } from 'jotai/utils'
+
+import { authApi } from '../api/api'
+import type { Item, Product } from './types'
 
 type ProductKey = 'shopping-list' | 'hista-complete'
 

@@ -1,11 +1,10 @@
-import { atom } from 'jotai';
-import { itemsAtom, productsAtom } from './atoms';
+import { atom } from 'jotai'
 
+import { itemsAtom, productsAtom } from './atoms'
 
-export const itemAtom = atom((get) => (id: number) => (
+export const itemAtom = atom(get => (id: number) => (
     get(itemsAtom).find(it => it.id == id)!
 ))
-
 
 export const itemsWithNamesAtom = atom((get) => {
     const items = get(itemsAtom)

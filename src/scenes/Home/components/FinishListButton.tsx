@@ -1,12 +1,13 @@
-import Button from '@mui/material/Button';
-import { useEffect, useState } from 'react';
-import { createListAtom, deleteListAtom } from '../../../store';
-import { useSetAtom } from 'jotai';
-import Dialog from '@mui/material/Dialog';
-import DialogTitle from '@mui/material/DialogTitle';
-import Typography from '@mui/material/Typography';
-import Box from '@mui/material/Box';
-import ButtonGroup from '@mui/material/ButtonGroup';
+import Box from '@mui/material/Box'
+import Button from '@mui/material/Button'
+import ButtonGroup from '@mui/material/ButtonGroup'
+import Dialog from '@mui/material/Dialog'
+import DialogTitle from '@mui/material/DialogTitle'
+import Typography from '@mui/material/Typography'
+import { useSetAtom } from 'jotai'
+import { useEffect, useState } from 'react'
+
+import { createListAtom, deleteListAtom } from '../../../store'
 
 export default function FinishListButton() {
     const [loading, setLoading] = useState(false)
@@ -20,7 +21,8 @@ export default function FinishListButton() {
         const ok = await deleteList(false)
         if (ok) {
             setSuccessfullyRemoved(true)
-        } else {
+        }
+        else {
             setShowConfirmation(true)
         }
         setLoading(false)
@@ -48,8 +50,8 @@ export default function FinishListButton() {
                 <DialogTitle>Liste löschen nicht möglich</DialogTitle>
                 <Box sx={{ padding: '2rem' }}>
                     <Typography>Nicht alle Gegenstände sind abgehakt. Liste löschen und Gegenstände entfernen?</Typography>
-                    <ButtonGroup variant='contained' sx={{ pt: '1rem' }}>
-                        <Button color='error' onClick={onConfirmDeletion}>Dennoch löschen</Button>
+                    <ButtonGroup variant="contained" sx={{ pt: '1rem' }}>
+                        <Button color="error" onClick={onConfirmDeletion}>Dennoch löschen</Button>
                         <Button onClick={() => setShowConfirmation(false)}>Behalten</Button>
                     </ButtonGroup>
                 </Box>

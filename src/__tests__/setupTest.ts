@@ -1,10 +1,12 @@
-import * as matchers from '@testing-library/jest-dom/matchers';
 import '@testing-library/jest-dom'
-import { setupServer } from 'msw/node'
-import { afterAll, afterEach, beforeAll, beforeEach, expect } from 'vitest';
-import { handlers } from './handler';
 
-expect.extend(matchers);
+import * as matchers from '@testing-library/jest-dom/matchers'
+import { setupServer } from 'msw/node'
+import { afterAll, afterEach, beforeAll, beforeEach, expect } from 'vitest'
+
+import { handlers } from './handler'
+
+expect.extend(matchers)
 
 export const server = setupServer(...handlers)
 
