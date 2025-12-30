@@ -10,56 +10,56 @@ import { useEffect, useState } from 'react'
 import { createListAtom, deleteListAtom } from '../../../store'
 
 export default function FinishListButton() {
-  const [loading, setLoading] = useState(false)
-  const [showConfirmation, setShowConfirmation] = useState(false)
-  const [successfullyRemoved, setSuccessfullyRemoved] = useState(false)
-  const deleteList = useSetAtom(deleteListAtom)
-  const createList = useSetAtom(createListAtom)
+    const [loading, setLoading] = useState(false)
+    const [showConfirmation, setShowConfirmation] = useState(false)
+    const [successfullyRemoved, setSuccessfullyRemoved] = useState(false)
+    const deleteList = useSetAtom(deleteListAtom)
+    const createList = useSetAtom(createListAtom)
 
-  const onClick = async () => {
-    setLoading(true)
-    const ok = await deleteList(false)
-    if (ok) {
-      setSuccessfullyRemoved(true)
+    const onClick = async () => {
+        setLoading(true)
+        const ok = await deleteList(false)
+        if (ok) {
+            setSuccessfullyRemoved(true)
+        }
+        else {
+            setShowConfirmation(true)
+        }
+        setLoading(false)
     }
-    else {
-      setShowConfirmation(true)
+
+    const onConfirmDeletion = async () => {
+        setLoading(true)
+        const ok = await deleteList(true)
+        setLoading(false)
+        if (ok) {
+            setShowConfirmation(false)
+            setSuccessfullyRemoved(true)
+        }
     }
-    setLoading(false)
-  }
 
-  const onConfirmDeletion = async () => {
-    setLoading(true)
-    const ok = await deleteList(true)
-    setLoading(false)
-    if (ok) {
-      setShowConfirmation(false)
-      setSuccessfullyRemoved(true)
-    }
-  }
+    useEffect(() => {
+        if (successfullyRemoved) {
+            createList()
+        }
+    }, [successfullyRemoved])
 
-  useEffect(() => {
-    if (successfullyRemoved) {
-      createList()
-    }
-  }, [successfullyRemoved])
+    return (
+        <>
+            <Dialog open={showConfirmation}>
+                <DialogTitle>Liste löschen nicht möglich</DialogTitle>
+                <Box sx={{ padding: '2rem' }}>
+                    <Typography>Nicht alle Gegenstände sind abgehakt. Liste löschen und Gegenstände entfernen?</Typography>
+                    <ButtonGroup variant="contained" sx={{ pt: '1rem' }}>
+                        <Button color="error" onClick={onConfirmDeletion}>Dennoch löschen</Button>
+                        <Button onClick={() => setShowConfirmation(false)}>Behalten</Button>
+                    </ButtonGroup>
+                </Box>
 
-  return (
-    <>
-      <Dialog open={showConfirmation}>
-        <DialogTitle>Liste löschen nicht möglich</DialogTitle>
-        <Box sx={{ padding: '2rem' }}>
-          <Typography>Nicht alle Gegenstände sind abgehakt. Liste löschen und Gegenstände entfernen?</Typography>
-          <ButtonGroup variant="contained" sx={{ pt: '1rem' }}>
-            <Button color="error" onClick={onConfirmDeletion}>Dennoch löschen</Button>
-            <Button onClick={() => setShowConfirmation(false)}>Behalten</Button>
-          </ButtonGroup>
-        </Box>
-
-      </Dialog>
-      <Button loading={loading} onClick={onClick}>
-        Liste abschließen
-      </Button>
-    </>
-  )
+            </Dialog>
+            <Button loading={loading} onClick={onClick}>
+                Liste abschließen
+            </Button>
+        </>
+    )
 }

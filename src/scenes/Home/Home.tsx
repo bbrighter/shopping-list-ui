@@ -9,18 +9,18 @@ import FinishListButton from './components/FinishListButton'
 import usePolling from './hooks/usePolling.ts'
 
 export default function Home() {
-  const { piid } = useAuth()
-  const fetchData = useSetAtom(fetchDataAtom)
+    const { piid } = useAuth()
+    const fetchData = useSetAtom(fetchDataAtom)
 
-  usePolling(fetchData, 4000, [piid, fetchData])
+    usePolling(fetchData, 4000, [piid, fetchData])
 
-  return (
-    <Container sx={{ padding: '2rem' }}>
-      <Stack spacing={3}>
-        <FinishListButton />
-        <ItemInput />
-        <ShoppingList />
-      </Stack>
-    </Container>
-  )
+    return (
+        <Container sx={{ padding: '2rem' }}>
+            <Stack spacing={3}>
+                <FinishListButton />
+                <ItemInput />
+                <ShoppingList />
+            </Stack>
+        </Container>
+    )
 }

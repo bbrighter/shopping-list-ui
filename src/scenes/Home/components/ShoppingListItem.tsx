@@ -14,48 +14,48 @@ import ItemCheckBox from './ItemCheckBox'
 import ItemSecondaryAction from './ItemSecondaryAction'
 
 export const ShoppingListItem = ({ it }: { it: Item }) => {
-  const check = useSetAtom(checkItemAtom)
-  const deleteItem = useSetAtom(deleteItemAtom)
+    const check = useSetAtom(checkItemAtom)
+    const deleteItem = useSetAtom(deleteItemAtom)
 
-  const checkButtonIcon = it.checked ? <UnpublishedIcon /> : <CheckCircleIcon />
+    const checkButtonIcon = it.checked ? <UnpublishedIcon /> : <CheckCircleIcon />
 
-  const leadingActions = () => (
-    <LeadingActions>
-      <SwipeAction onClick={() => check(it.id)}>
-        <Button
-          variant="contained"
-          color="info"
-          endIcon={checkButtonIcon}
-        />
-      </SwipeAction>
-    </LeadingActions>
-  )
+    const leadingActions = () => (
+        <LeadingActions>
+            <SwipeAction onClick={() => check(it.id)}>
+                <Button
+                    variant="contained"
+                    color="info"
+                    endIcon={checkButtonIcon}
+                />
+            </SwipeAction>
+        </LeadingActions>
+    )
 
-  const trailingActions = () => (
-    <TrailingActions>
-      <SwipeAction
-        onClick={() => deleteItem(it.id)}
-        destructive
-      >
-        <Button
-          variant="contained"
-          color="error"
-          startIcon={<DeleteIcon />}
-        />
-      </SwipeAction>
-    </TrailingActions>
-  )
+    const trailingActions = () => (
+        <TrailingActions>
+            <SwipeAction
+                onClick={() => deleteItem(it.id)}
+                destructive
+            >
+                <Button
+                    variant="contained"
+                    color="error"
+                    startIcon={<DeleteIcon />}
+                />
+            </SwipeAction>
+        </TrailingActions>
+    )
 
-  return (
-    <SwipeableListItem
-      threshold={0.5}
-      leadingActions={leadingActions()}
-      trailingActions={trailingActions()}
-    >
-      <ListItem secondaryAction={<ItemSecondaryAction item={it} />}>
-        <ItemCheckBox item={it} />
-        <ListItemText primary={it.productName || 'no name'} secondary={it.quantity} />
-      </ListItem>
-    </SwipeableListItem>
-  )
+    return (
+        <SwipeableListItem
+            threshold={0.5}
+            leadingActions={leadingActions()}
+            trailingActions={trailingActions()}
+        >
+            <ListItem secondaryAction={<ItemSecondaryAction item={it} />}>
+                <ItemCheckBox item={it} />
+                <ListItemText primary={it.productName || 'no name'} secondary={it.quantity} />
+            </ListItem>
+        </SwipeableListItem>
+    )
 }
