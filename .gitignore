@@ -3,4 +3,5 @@ dist
 .vscode/*
 graph.svg
 false
-pnpm-workspace.yaml
+bundle-stats.html
+coverage

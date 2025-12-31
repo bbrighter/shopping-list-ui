@@ -47,14 +47,14 @@ const useSetPermissions = () => {
 
     useEffect(() => {
         setPermissions()
-    }, [token, api, setPermissions])
+    }, [token, api])
 }
 
 const usePiidLocation = () => {
     const { piid } = useAuth()
     const setPiid = useSetAtom(piidAtom)
-    const api = useAtomValue(authApiAtom)
     const [, navigate] = useLocation()
+    const api = useAtomValue(authApiAtom)
 
     useEffect(() => {
         if (piid) {
@@ -63,5 +63,5 @@ const usePiidLocation = () => {
                 replace: true,
             })
         }
-    }, [piid, api, navigate, setPiid])
+    }, [piid, api])
 }

@@ -8,17 +8,20 @@ import globals from 'globals'
 import tseslint from 'typescript-eslint'
 
 export default defineConfig([
+    {
+        ignores: ['dist/**', 'node_modules/**'],
+    },
     jseslint.configs.recommended,
     tseslint.configs.recommended,
     stylistic.configs.recommended,
     pluginReactHooks.configs.flat.recommended,
+    pluginReact.configs.flat.recommended,
     {
         files: ['**/*.{js,mjs,cjs,ts,jsx,tsx}'],
         languageOptions: {
             globals: globals.browser,
         },
         plugins: {
-            'react': pluginReact,
             'simple-import-sort': simpleImportSort,
         },
         rules: {
@@ -34,6 +37,7 @@ export default defineConfig([
             '@stylistic/indent': ['error', 4],
             '@stylistic/jsx-indent-props': 'off',
             '@typescript-eslint/no-unused-vars': 'off',
+            'react-hooks/exhaustive-deps': 'off',
         },
     },
 ])
