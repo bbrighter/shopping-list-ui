@@ -29,15 +29,18 @@ export default defineConfig([
             'comma-dangle': ['error', 'always-multiline'],
             'object-curly-spacing': ['error', 'always'],
             'no-console': 'warn',
+            'indent': 'off',
+
             'react/react-in-jsx-scope': 'off',
             'react/prop-types': 'off',
+
             'simple-import-sort/imports': 'warn',
             'simple-import-sort/exports': 'error',
-            'indent': 'off',
+
             '@stylistic/indent': ['error', 4],
             '@stylistic/jsx-indent-props': 'off',
+
             '@typescript-eslint/no-unused-vars': 'off',
-            'react-hooks/exhaustive-deps': 'off',
         },
     },
 ])
