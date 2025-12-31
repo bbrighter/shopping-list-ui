@@ -6,7 +6,7 @@ import type { ReactNode } from 'react'
 import { describe, expect, it, vi } from 'vitest'
 
 import { api } from '../../api/api'
-import { piidAtom } from '../../store'
+import { piidAtom } from '../../store/atoms.app'
 import Home from './Home'
 
 const findListItem = async (name: string) => {
@@ -88,7 +88,7 @@ describe('home page', () => {
     })
 
     it('Delete', { skip: true }, async () => {
-    // No idea how to test this with swiping only!
+        // No idea how to test this with swiping only!
         render(<HomeProvider />)
 
         const listItem1 = await findListItem('prod1')

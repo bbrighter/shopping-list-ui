@@ -2,7 +2,7 @@ import jseslint from '@eslint/js'
 import stylistic from '@stylistic/eslint-plugin'
 import { defineConfig } from 'eslint/config'
 import pluginReact from 'eslint-plugin-react'
-import reactCompiler from 'eslint-plugin-react-compiler'
+import pluginReactHooks from 'eslint-plugin-react-hooks'
 import simpleImportSort from 'eslint-plugin-simple-import-sort'
 import globals from 'globals'
 import tseslint from 'typescript-eslint'
@@ -11,7 +11,7 @@ export default defineConfig([
     jseslint.configs.recommended,
     tseslint.configs.recommended,
     stylistic.configs.recommended,
-    reactCompiler.configs.recommended,
+    pluginReactHooks.configs.flat.recommended,
     {
         files: ['**/*.{js,mjs,cjs,ts,jsx,tsx}'],
         languageOptions: {

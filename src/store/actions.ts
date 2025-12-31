@@ -1,11 +1,10 @@
 import { atom } from 'jotai'
 
-import { api } from '../api/api'
-import { isAPIError } from '../api/generatedApi'
-import { etagAtom, itemsAtom, listIdAtom, piidAtom, productsAtom } from './atoms'
+import { api, isAPIError } from '../api/api'
+import { etagAtom, piidAtom } from './atoms.app'
+import { itemsAtom, listIdAtom, productsAtom, resetPollingAtom } from './atoms.items'
 import { itemAtom } from './selectors'
-import { type Product, respToData } from './types'
-import { type Item, respToItem } from './types'
+import { type Item, type Product, respToData, respToItem } from './types'
 
 export const fetchDataAtom = atom(null, async (get, set) => {
     const piid = get(piidAtom)
@@ -36,6 +35,7 @@ export const createListAtom = atom(null, async (get, set) => {
     const piid = get(piidAtom)
     const resp = await api.PostList(piid)
     set(listIdAtom, resp.id)
+    set(resetPollingAtom, v => v + 1)
 })
 
 export const checkItemAtom = atom(null, async (get, set, id: number) => {
@@ -45,6 +45,7 @@ export const checkItemAtom = atom(null, async (get, set, id: number) => {
     const newItems = get(itemsAtom).map(it => it.id == id ? checkedItem : it)
     await api.CheckItem(piid, id)
     set(itemsAtom, newItems)
+    set(resetPollingAtom, v => v + 1)
 })
 
 export const changeItemQuantityAtom = atom(null, async (get, set, id: number, newQuantity?: number) => {
@@ -54,6 +55,7 @@ export const changeItemQuantityAtom = atom(null, async (get, set, id: number, ne
     const newItems = get(itemsAtom).map(it => it.id == id ? newItem : it)
     await api.PatchItem(piid, id, { quantity: newQuantity ?? 0 })
     set(itemsAtom, newItems)
+    set(resetPollingAtom, v => v + 1)
 })
 
 type PostItemParams = { piid: string, listId: number, id: number } | { piid: string, listId: number, name: string }
@@ -78,12 +80,13 @@ export const postItemAtom = atom(null, async (get, set, args: { id: number } | {
     const piid = get(piidAtom)
     const { item, product } = await postItem({ piid: piid, listId: get(listIdAtom), ...args })
     if (product) {
-        set(productsAtom, [...get(productsAtom), product])
+        set(productsAtom, prev => [...prev, product])
     }
     const itemProductName = get(productsAtom).find(p => p.id == item.productId)!.name
     item.productName = itemProductName
     const newItems = [...get(itemsAtom), item]
     set(itemsAtom, newItems)
+    set(resetPollingAtom, v => v + 1)
 })
 
 export const deleteItemAtom = atom(null, async (get, set, id: number) => {
@@ -91,13 +94,15 @@ export const deleteItemAtom = atom(null, async (get, set, id: number) => {
     await api.DeleteItem(piid, id)
     const newItems = get(itemsAtom).filter(it => it.id != id)
     set(itemsAtom, newItems)
+    set(resetPollingAtom, v => v + 1)
 })
 
-export const deleteListAtom = atom(null, async (get, _set, force: boolean) => {
+export const deleteListAtom = atom(null, async (get, set, force: boolean) => {
     const piid = get(piidAtom)
     try {
         const listId = get(listIdAtom)
         await api.DeleteList(piid, listId, { Force: force })
+        set(resetPollingAtom, v => v + 1)
         return true
     }
     catch {

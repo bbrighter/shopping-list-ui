@@ -1,9 +1,16 @@
+import { useAtomValue } from 'jotai'
 import { useEffect, useRef } from 'react'
+
+import { pollingStateAtom } from '../../../store'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const usePolling = (callback: () => Promise<void>, interval: number, deps: Array<any>) => {
+    const resetPolling = useAtomValue(pollingStateAtom)
     const callbackRef = useRef(callback)
-    callbackRef.current = callback
+
+    useEffect(() => {
+        callbackRef.current = callback
+    }, [callback])
 
     useEffect(() => {
         let id: number | null
@@ -11,7 +18,7 @@ const usePolling = (callback: () => Promise<void>, interval: number, deps: Array
 
         const handleVisibilityChange = () => {
             if (document.visibilityState == 'visible') {
-                tick()
+                if (resetPolling == 0) tick()
                 id = setInterval(tick, interval)
             }
             else if (id) {
@@ -27,7 +34,8 @@ const usePolling = (callback: () => Promise<void>, interval: number, deps: Array
             if (id) clearInterval(id)
             document.removeEventListener('visibilitychange', handleVisibilityChange)
         }
-    }, deps)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [resetPolling, interval, ...deps])
 }
 
 export default usePolling

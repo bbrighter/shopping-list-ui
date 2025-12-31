@@ -4,7 +4,6 @@ import { atom } from 'jotai'
 import { atomWithStorage } from 'jotai/utils'
 
 import { authApi } from '../api/api'
-import type { Item, Product } from './types'
 
 type ProductKey = 'shopping-list' | 'hista-complete'
 
@@ -27,9 +26,6 @@ const storage = {
 }
 
 export const piidAtom = atom('')
-export const listIdAtom = atom(0)
-export const itemsAtom = atom<Array<Item>>([])
-export const productsAtom = atom<Array<Product>>([])
 export const etagAtom = atom('')
 export const tokenAtom = atomWithStorage('new-token', '', storage)
 export const authApiAtom = atom<AuthApi>(authApi)
