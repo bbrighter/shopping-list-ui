@@ -47,6 +47,7 @@ const useSetPermissions = () => {
 
     useEffect(() => {
         setPermissions()
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [token, api])
 }
 
@@ -63,5 +64,6 @@ const usePiidLocation = () => {
                 replace: true,
             })
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [piid, api])
 }
