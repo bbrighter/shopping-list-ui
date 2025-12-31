@@ -34,7 +34,6 @@ const usePolling = (callback: () => Promise<void>, interval: number, deps: Array
             if (id) clearInterval(id)
             document.removeEventListener('visibilitychange', handleVisibilityChange)
         }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [resetPolling, interval, ...deps])
 }
 
