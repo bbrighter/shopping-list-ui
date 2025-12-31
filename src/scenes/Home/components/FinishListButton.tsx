@@ -42,7 +42,7 @@ export default function FinishListButton() {
         if (successfullyRemoved) {
             createList()
         }
-    }, [successfullyRemoved])
+    }, [successfullyRemoved, createList])
 
     return (
         <>

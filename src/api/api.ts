@@ -25,3 +25,5 @@ const options: ClientOptions = {
 const baseClient = new Client(baseUrl, options)
 export const authApi = baseClient.authentication
 export const api = baseClient.shoppinglist
+
+export { type entity, isAPIError } from './generatedApi'

@@ -6,7 +6,8 @@ import { beforeEach, describe, expect, it } from 'vitest'
 import { server } from '../__tests__/setupTest'
 import { getMomentsHandler } from '../__tests__/shoppingListHandler'
 import { changeItemQuantityAtom, checkItemAtom, deleteItemAtom, deleteListAtom, fetchDataAtom, postItemAtom } from './actions'
-import { etagAtom, itemsAtom, listIdAtom, piidAtom, productsAtom } from './atoms'
+import { etagAtom, piidAtom } from './atoms.app'
+import { itemsAtom, listIdAtom, productsAtom } from './atoms.items'
 
 describe('actions', () => {
     let store: Store

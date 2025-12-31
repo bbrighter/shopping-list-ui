@@ -1,4 +1,4 @@
-import type { entity } from '../api/generatedApi'
+import type { entity } from '../api/api'
 
 export type Item = {
     id: number

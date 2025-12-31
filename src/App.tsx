@@ -7,8 +7,7 @@ import { useEffect } from 'react'
 import { Redirect, Route, Switch, useLocation } from 'wouter'
 
 import Home from './scenes/Home/Home'
-import { useAuthStateAdapter, useUserManagementAdapter } from './store/adapter.ts'
-import { authApiAtom, piidAtom } from './store/atoms.ts'
+import { authApiAtom, piidAtom, useAuthStateAdapter, useUserManagementAdapter } from './store'
 
 export default function App() {
     const [_, navigate] = useLocation()
@@ -48,7 +47,7 @@ const useSetPermissions = () => {
 
     useEffect(() => {
         setPermissions()
-    }, [token, api])
+    }, [token, api, setPermissions])
 }
 
 const usePiidLocation = () => {
@@ -64,5 +63,5 @@ const usePiidLocation = () => {
                 replace: true,
             })
         }
-    }, [piid, api])
+    }, [piid, api, navigate, setPiid])
 }
