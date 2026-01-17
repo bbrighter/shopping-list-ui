@@ -47,12 +47,22 @@ export default function FinishListButton() {
     return (
         <>
             <Dialog open={showConfirmation}>
-                <DialogTitle>Liste löschen nicht möglich</DialogTitle>
+                <DialogTitle>Liste enthält noch Ungekauftes</DialogTitle>
                 <Box sx={{ padding: '2rem' }}>
                     <Typography>Nicht alle Gegenstände sind abgehakt. Liste löschen und Gegenstände entfernen?</Typography>
-                    <ButtonGroup variant="contained" sx={{ pt: '1rem' }}>
-                        <Button color="error" onClick={onConfirmDeletion}>Dennoch löschen</Button>
-                        <Button onClick={() => setShowConfirmation(false)}>Behalten</Button>
+                    <ButtonGroup variant="contained" sx={{ pt: '1rem' }} color="inherit">
+                        <Button
+                            color="error"
+                            onClick={onConfirmDeletion}
+                        >
+                            Dennoch löschen
+                        </Button>
+                        <Button
+                            color="inherit"
+                            onClick={() => setShowConfirmation(false)}
+                        >
+                            Behalten
+                        </Button>
                     </ButtonGroup>
                 </Box>
 
