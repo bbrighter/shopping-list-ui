@@ -138,22 +138,17 @@ describe('home page', () => {
         const finishListButton = await screen.findByText('Liste abschließen')
         await userEvent.click(finishListButton)
 
-        expect(await screen.findByText('Liste löschen nicht möglich')).toBeInTheDocument()
+        expect(await screen.findByRole('dialog')).toBeVisible()
         const keepButton = screen.getByText('Behalten')
 
-        await waitFor(() => {
-            userEvent.click(keepButton)
-            expect(screen.queryByText('Liste löschen nicht möglich')).not.toBeInTheDocument()
-        })
+        await userEvent.click(keepButton)
+        expect(screen.getByRole('dialog')).not.toBeVisible()
 
         await userEvent.click(finishListButton)
         const deleteButton = await screen.findByText('Dennoch löschen')
         await userEvent.click(deleteButton)
-
-        await waitFor(() => {
-            expect(screen.queryByText('Liste löschen nicht möglich')).not.toBeInTheDocument()
-            expect(spy).toHaveBeenCalledOnce()
-        })
+        expect(await screen.findByRole('dialog')).not.toBeVisible()
+        expect(spy).toHaveBeenCalledOnce()
     })
 
     it('patch quantity', async () => {

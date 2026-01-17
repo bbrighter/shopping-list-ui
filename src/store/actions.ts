@@ -41,20 +41,44 @@ export const createListAtom = atom(null, async (get, set) => {
 export const checkItemAtom = atom(null, async (get, set, id: number) => {
     const piid = get(piidAtom)
     const item = get(itemAtom)(id)
+    const previousItems = get(itemsAtom)
     const checkedItem = { ...item, checked: !item.checked }
     const newItems = get(itemsAtom).map(it => it.id == id ? checkedItem : it)
-    await api.CheckItem(piid, id)
     set(itemsAtom, newItems)
-    set(resetPollingAtom, v => v + 1)
+    try {
+        await api.CheckItem(piid, id)
+        set(resetPollingAtom, v => v + 1)
+    }
+    catch {
+        set(itemsAtom, previousItems)
+    }
 })
+
+const debounceTimer = new Map<number, number>()
 
 export const changeItemQuantityAtom = atom(null, async (get, set, id: number, newQuantity?: number) => {
     const piid = get(piidAtom)
     const item = get(itemAtom)(id)
+    const previousItems = get(itemsAtom)
     const newItem = { ...item, quantity: newQuantity }
     const newItems = get(itemsAtom).map(it => it.id == id ? newItem : it)
-    await api.PatchItem(piid, id, { quantity: newQuantity ?? 0 })
+
     set(itemsAtom, newItems)
+
+    const existing = debounceTimer.get(id)
+    if (existing) clearTimeout(existing)
+    const timeout = window.setTimeout(async () => {
+        try {
+            debounceTimer.delete(id)
+            await api.PatchItem(piid, id, { quantity: newQuantity ?? 0 })
+        }
+        catch {
+            set(itemsAtom, previousItems)
+        }
+    }, 500)
+
+    debounceTimer.set(id, timeout)
+
     set(resetPollingAtom, v => v + 1)
 })
 
@@ -91,9 +115,15 @@ export const postItemAtom = atom(null, async (get, set, args: { id: number } | {
 
 export const deleteItemAtom = atom(null, async (get, set, id: number) => {
     const piid = get(piidAtom)
-    await api.DeleteItem(piid, id)
+    const originalItems = get(itemsAtom)
     const newItems = get(itemsAtom).filter(it => it.id != id)
     set(itemsAtom, newItems)
+    try {
+        await api.DeleteItem(piid, id)
+    }
+    catch {
+        set(itemsAtom, originalItems)
+    }
     set(resetPollingAtom, v => v + 1)
 })
 
