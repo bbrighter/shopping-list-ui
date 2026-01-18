@@ -4,6 +4,7 @@ import { Login } from '@bbrighter/auth-module/login'
 import { UserManagementProvider } from '@bbrighter/auth-module/users'
 import { useAtomValue, useSetAtom } from 'jotai'
 import { useEffect } from 'react'
+import { Toaster } from 'sonner'
 import { Redirect, Route, Switch, useLocation } from 'wouter'
 
 import Home from './scenes/Home/Home'
@@ -19,6 +20,7 @@ export default function App() {
 
     return (
         <AuthProvider adapter={authStateAdpater}>
+            <Toaster />
             <UserManagementProvider adapter={userManagementAdapter}>
                 <AppEffects navigate={navigate} />
                 <CustomAppBar />
