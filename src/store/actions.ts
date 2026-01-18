@@ -46,7 +46,7 @@ export const checkItemAtom = atom(null, async (get, set, id: number) => {
     const newItems = get(itemsAtom).map(it => it.id == id ? checkedItem : it)
     set(itemsAtom, newItems)
     try {
-        await api.CheckItem(piid, id)
+        await api.CheckItem(piid, id, { checked: !item.checked })
         set(resetPollingAtom, v => v + 1)
     }
     catch {
