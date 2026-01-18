@@ -179,6 +179,11 @@ describe('home page', () => {
     })
 
     it('error toast is shown', async () => {
+        // Need to mock pointer capture events for this test
+        HTMLElement.prototype.setPointerCapture = () => {}
+        HTMLElement.prototype.releasePointerCapture = () => {}
+
+        userEvent.setup()
         server.use(http.get('/piid/:piid/moments', () => HttpResponse.json({ status: 400, code: ErrCode.InvalidArgument, name: 'name', message: 'msg' } satisfies APIError, { status: 400 })))
 
         render(<HomeProvider />)
@@ -190,5 +195,8 @@ describe('home page', () => {
         const copyButton = within(toast).getByText('Kopieren')
         expect(copyButton).toBeInTheDocument()
         await userEvent.click(copyButton)
+
+        const clipboardText = await navigator.clipboard.readText()
+        expect(clipboardText).toContain('Fehler mit Statuscode 400 bei: Eintrag abhaken')
     })
 })
