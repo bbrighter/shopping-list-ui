@@ -3,7 +3,7 @@ import type { UserStateAdapter } from '@bbrighter/auth-module/users'
 import { useAtom, useAtomValue } from 'jotai'
 import { useLocation as useLocationWouter } from 'wouter'
 
-import { authApiAtom, piidAtom, productInstancesAtom, productKeyAtom, tokenAtom, userApiAtom, userNameAtom, usersAtom } from './atoms.app'
+import { authApiAtom, piidAtom, productInstancesAtom, productInstancesLoadedAtom, productKeyAtom, tokenAtom, userApiAtom, userNameAtom, usersAtom } from './atoms.app'
 
 export const useAuthStateAdapter = (): AuthStateAdapter => {
     const [token, setToken] = useAtom(tokenAtom)
@@ -13,7 +13,8 @@ export const useAuthStateAdapter = (): AuthStateAdapter => {
     const [userName, setUserName] = useAtom(userNameAtom)
     const useUserName = () => ({ userName, setUserName })
     const [instances, setInstances] = useAtom(productInstancesAtom)
-    const useProductInstances = () => ({ instances, setInstances })
+    const [isLoaded, setIsLoaded] = useAtom(productInstancesLoadedAtom)
+    const useProductInstances = () => ({ instances, setInstances, isLoaded, setIsLoaded })
     const productKey = useAtomValue(productKeyAtom)
     const useProductKey = () => (productKey)
     const [location, navigate] = useLocationWouter()

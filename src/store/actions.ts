@@ -28,7 +28,7 @@ export const fetchDataAtom = atom(null, async (get, set) => {
             set(listIdAtom, resp.id)
             return
         }
-        handleException(error, 'Eintrag abhaken')
+        handleException(error, 'Daten holen')
     }
 })
 

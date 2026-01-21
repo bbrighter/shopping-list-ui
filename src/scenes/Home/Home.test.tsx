@@ -197,6 +197,6 @@ describe('home page', () => {
         await userEvent.click(copyButton)
 
         const clipboardText = await navigator.clipboard.readText()
-        expect(clipboardText).toContain('Fehler mit Statuscode 400 bei: Eintrag abhaken')
+        expect(clipboardText).toContain('Fehler mit Statuscode 400 bei: Daten holen')
     })
 })

@@ -7,6 +7,7 @@ import { useEffect } from 'react'
 import { Toaster } from 'sonner'
 import { Redirect, Route, Switch, useLocation } from 'wouter'
 
+import { PermissionLoader } from './scenes/Components'
 import Home from './scenes/Home/Home'
 import { authApiAtom, piidAtom, useAuthStateAdapter, useUserManagementAdapter } from './store'
 
@@ -23,6 +24,7 @@ export default function App() {
             <Toaster />
             <UserManagementProvider adapter={userManagementAdapter}>
                 <AppEffects navigate={navigate} />
+                <PermissionLoader />
                 <CustomAppBar />
                 <Switch>
                     <Route path="/login" component={Login} />
@@ -44,13 +46,14 @@ const AppEffects = ({ navigate }: { navigate: (_: string) => void }) => {
 }
 
 const useSetPermissions = () => {
-    const { setPermissions, token } = useAuth()
+    const { setPermissions, token, isLoaded } = useAuth()
     const api = useAtomValue(authApiAtom)
 
     useEffect(() => {
+        if (isLoaded) return
         setPermissions()
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [token, api])
+    }, [token, api, isLoaded])
 }
 
 const usePiidLocation = () => {
