@@ -36,6 +36,7 @@ export const createListAtom = atom(null, async (get, set) => {
     const piid = get(piidAtom)
     const resp = await api.PostList(piid)
     set(listIdAtom, resp.id)
+    set(itemsAtom, [])
     set(resetPollingAtom, v => v + 1)
 })
 

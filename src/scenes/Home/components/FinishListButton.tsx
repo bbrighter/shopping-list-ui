@@ -5,14 +5,15 @@ import Dialog from '@mui/material/Dialog'
 import DialogTitle from '@mui/material/DialogTitle'
 import Typography from '@mui/material/Typography'
 import { useSetAtom } from 'jotai'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 
 import { createListAtom, deleteListAtom } from '../../../store'
+import { FullSizeLoader } from '../../Components'
 
 export default function FinishListButton() {
     const [loading, setLoading] = useState(false)
+    const [creationLoading, setCreationLoading] = useState(false)
     const [showConfirmation, setShowConfirmation] = useState(false)
-    const [successfullyRemoved, setSuccessfullyRemoved] = useState(false)
     const deleteList = useSetAtom(deleteListAtom)
     const createList = useSetAtom(createListAtom)
 
@@ -20,7 +21,7 @@ export default function FinishListButton() {
         setLoading(true)
         const ok = await deleteList(false)
         if (ok) {
-            setSuccessfullyRemoved(true)
+            await createNewList()
         }
         else {
             setShowConfirmation(true)
@@ -34,18 +35,19 @@ export default function FinishListButton() {
         setLoading(false)
         if (ok) {
             setShowConfirmation(false)
-            setSuccessfullyRemoved(true)
+            await createNewList()
         }
     }
 
-    useEffect(() => {
-        if (successfullyRemoved) {
-            createList()
-        }
-    }, [successfullyRemoved, createList])
+    const createNewList = async () => {
+        setCreationLoading(true)
+        await createList()
+        setCreationLoading(false)
+    }
 
     return (
         <>
+            <FullSizeLoader open={creationLoading} />
             <Dialog open={showConfirmation}>
                 <DialogTitle>Liste enthält noch Ungekauftes</DialogTitle>
                 <Box sx={{ padding: '2rem' }}>
