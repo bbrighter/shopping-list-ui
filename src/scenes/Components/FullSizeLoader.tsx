@@ -4,7 +4,7 @@ import CircularProgress from '@mui/material/CircularProgress'
 export const FullSizeLoader = ({ open }: { open: boolean }) => {
     return (
         <Backdrop
-            data-testid="permission-backdrop"
+            data-testid="loader-backdrop"
             open={open}
             sx={theme => ({ color: '#fff', zIndex: theme.zIndex.drawer + 1 })}
         >

@@ -25,7 +25,8 @@ describe('app', () => {
 
         renderApp('/68a06340-c811-4820-bb18-fbe750f24f4a')
 
-        const backdrop = screen.getByTestId('permission-backdrop')
+        const backdrop = screen.getAllByTestId('loader-backdrop')[0]
+        expect(backdrop).toBeInTheDocument()
 
         await waitFor(
             () => expect(backdrop).toBeVisible(),
