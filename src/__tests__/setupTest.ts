@@ -2,7 +2,7 @@ import '@testing-library/jest-dom'
 
 import * as matchers from '@testing-library/jest-dom/matchers'
 import { setupServer } from 'msw/node'
-import { afterAll, afterEach, beforeAll, beforeEach, expect } from 'vitest'
+import { afterAll, afterEach, beforeAll, beforeEach, expect, vi } from 'vitest'
 
 import { handlers } from './handler'
 
@@ -20,10 +20,10 @@ beforeAll(() => {
 })
 beforeEach(() => {
     window.localStorage.setItem('new-token', '123')
+    vi.resetAllMocks()
 })
 afterEach(() => {
     server.resetHandlers()
     window.localStorage.clear()
-    // vi.clearAllMocks()
 })
 afterAll(() => server.close())

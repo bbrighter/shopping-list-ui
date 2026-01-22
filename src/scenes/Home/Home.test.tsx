@@ -2,10 +2,14 @@ import { render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { Provider } from 'jotai'
 import { useHydrateAtoms } from 'jotai/utils'
+import { http, HttpResponse } from 'msw'
 import type { ReactNode } from 'react'
+import { Toaster } from 'sonner'
 import { describe, expect, it, vi } from 'vitest'
 
+import { server } from '../../__tests__/setupTest'
 import { api } from '../../api/api'
+import { type APIError, ErrCode } from '../../api/generatedApi'
 import { piidAtom } from '../../store/atoms.app'
 import Home from './Home'
 
@@ -33,6 +37,7 @@ const TestProvider = ({ initialValues, children }: { initialValues: any, childre
 const HomeProvider = () => {
     return (
         <TestProvider initialValues={[[piidAtom, '68a06340-c811-4820-bb18-fbe750f24f4a']]}>
+            <Toaster />
             <Home />
         </TestProvider>
     )
@@ -171,5 +176,27 @@ describe('home page', () => {
             userEvent.click(minusButton)
             expect(within(listItem2).queryByText('1')).not.toBeInTheDocument()
         })
+    })
+
+    it('error toast is shown', async () => {
+        // Need to mock pointer capture events for this test
+        HTMLElement.prototype.setPointerCapture = () => {}
+        HTMLElement.prototype.releasePointerCapture = () => {}
+
+        userEvent.setup()
+        server.use(http.get('/piid/:piid/moments', () => HttpResponse.json({ status: 400, code: ErrCode.InvalidArgument, name: 'name', message: 'msg' } satisfies APIError, { status: 400 })))
+
+        render(<HomeProvider />)
+
+        const toast = (await screen.findByText(/Fehler mit Statuscode/)).closest('li')!
+        expect(toast).toBeInTheDocument()
+        expect(within(toast).getByText('msg')).toBeInTheDocument()
+
+        const copyButton = within(toast).getByText('Kopieren')
+        expect(copyButton).toBeInTheDocument()
+        await userEvent.click(copyButton)
+
+        const clipboardText = await navigator.clipboard.readText()
+        expect(clipboardText).toContain('Fehler mit Statuscode 400 bei: Daten holen')
     })
 })

@@ -1,6 +1,5 @@
 node_modules
 dist
-.vscode/*
 graph.svg
 false
 bundle-stats.html

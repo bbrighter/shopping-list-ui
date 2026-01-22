@@ -3,11 +3,13 @@ import { atom } from 'jotai'
 import { api, isAPIError } from '../api/api'
 import { etagAtom, piidAtom } from './atoms.app'
 import { itemsAtom, listIdAtom, productsAtom, resetPollingAtom } from './atoms.items'
+import { handleException } from './error'
 import { itemAtom } from './selectors'
 import { type Item, type Product, respToData, respToItem } from './types'
 
 export const fetchDataAtom = atom(null, async (get, set) => {
     const piid = get(piidAtom)
+    if (!piid) return
     try {
         const ifNoneMatch = get(etagAtom)
         const resp = await api.GetMoments(piid, { IfNoneMatch: ifNoneMatch })
@@ -26,8 +28,7 @@ export const fetchDataAtom = atom(null, async (get, set) => {
             set(listIdAtom, resp.id)
             return
         }
-        // eslint-disable-next-line no-console
-        console.error('catch:', error)
+        handleException(error, 'Daten holen')
     }
 })
 
@@ -35,6 +36,7 @@ export const createListAtom = atom(null, async (get, set) => {
     const piid = get(piidAtom)
     const resp = await api.PostList(piid)
     set(listIdAtom, resp.id)
+    set(itemsAtom, [])
     set(resetPollingAtom, v => v + 1)
 })
 
@@ -49,7 +51,8 @@ export const checkItemAtom = atom(null, async (get, set, id: number) => {
         await api.CheckItem(piid, id, { checked: !item.checked })
         set(resetPollingAtom, v => v + 1)
     }
-    catch {
+    catch (e) {
+        handleException(e, 'Eintrag checken')
         set(itemsAtom, previousItems)
     }
 })
@@ -72,7 +75,8 @@ export const changeItemQuantityAtom = atom(null, async (get, set, id: number, ne
             debounceTimer.delete(id)
             await api.PatchItem(piid, id, { quantity: newQuantity ?? 0 })
         }
-        catch {
+        catch (e) {
+            handleException(e, 'Anzahl ändern')
             set(itemsAtom, previousItems)
         }
     }, 500)
@@ -121,7 +125,8 @@ export const deleteItemAtom = atom(null, async (get, set, id: number) => {
     try {
         await api.DeleteItem(piid, id)
     }
-    catch {
+    catch (e) {
+        handleException(e, 'Eintrag löschen')
         set(itemsAtom, originalItems)
     }
     set(resetPollingAtom, v => v + 1)
@@ -135,7 +140,11 @@ export const deleteListAtom = atom(null, async (get, set, force: boolean) => {
         set(resetPollingAtom, v => v + 1)
         return true
     }
-    catch {
+    catch (e) {
+        if (isAPIError(e) && e.status == 400 && e.message.includes('unchecked items exist')) {
+            return false
+        }
+        handleException(e, 'Liste löschen')
         return false
     }
 })
