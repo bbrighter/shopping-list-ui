@@ -7,7 +7,7 @@ import { server } from '../__tests__/setupTest'
 import { getMomentsHandler } from '../__tests__/shoppingListHandler'
 import { changeItemQuantityAtom, checkItemAtom, deleteItemAtom, deleteListAtom, fetchDataAtom, postItemAtom } from './actions'
 import { etagAtom, piidAtom } from './atoms.app'
-import { itemsAtom, listIdAtom, productsAtom } from './atoms.items'
+import { itemsAtom, itemsLoadedAtom, listIdAtom, productsAtom } from './atoms.items'
 
 describe('actions', () => {
     let store: Store
@@ -29,6 +29,9 @@ describe('actions', () => {
 
             const etag = store.get(etagAtom)
             expect(etag).toBe('123')
+
+            const itemsLoaded = store.get(itemsLoadedAtom)
+            expect(itemsLoaded).toBeTruthy()
         })
 
         it('404 creates an empty list', async () => {

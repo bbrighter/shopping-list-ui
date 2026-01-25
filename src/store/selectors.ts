@@ -1,6 +1,6 @@
 import { atom } from 'jotai'
 
-import { itemsAtom, productsAtom, resetPollingAtom } from './atoms.items'
+import { itemsAtom, itemsLoadedAtom, productsAtom, resetPollingAtom } from './atoms.items'
 
 export const itemAtom = atom(get => (id: number) => (
     get(itemsAtom).find(it => it.id == id)!
@@ -24,4 +24,15 @@ export const productsNotInUseAtom = atom((get) => {
 export const pollingStateAtom = atom((get) => {
     const polling = get(resetPollingAtom)
     return polling
+})
+
+export const noItemsAtom = atom((get) => {
+    const loaded = get(itemsLoadedAtom)
+    const numberOfItems = get(itemsAtom).length
+    return loaded && numberOfItems == 0
+})
+
+export const listCanBeClosedAtom = atom((get) => {
+    const items = get(itemsAtom)
+    return items.every(i => i.checked)
 })

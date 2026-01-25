@@ -4,8 +4,8 @@ import Stack from '@mui/material/Stack'
 import { useSetAtom } from 'jotai'
 
 import { fetchDataAtom } from '../../store'
-import { ItemInput, ShoppingList } from './components'
-import FinishListButton from './components/FinishListButton'
+import { FinishListButton, ItemInput, ShoppingList } from './components'
+import { NoData } from './components/NoData.tsx'
 import usePolling from './hooks/usePolling.ts'
 
 export default function Home() {
@@ -19,6 +19,7 @@ export default function Home() {
             <Stack spacing={3}>
                 <FinishListButton />
                 <ItemInput />
+                <NoData />
                 <ShoppingList />
             </Stack>
         </Container>

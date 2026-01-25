@@ -4,24 +4,27 @@ import ButtonGroup from '@mui/material/ButtonGroup'
 import Dialog from '@mui/material/Dialog'
 import DialogTitle from '@mui/material/DialogTitle'
 import Typography from '@mui/material/Typography'
-import { useSetAtom } from 'jotai'
+import { useAtomValue, useSetAtom } from 'jotai'
 import { useState } from 'react'
 
-import { createListAtom, deleteListAtom } from '../../../store'
+import { createListAtom, deleteListAtom, listCanBeClosedAtom } from '../../../store'
 import { FullSizeLoader } from '../../Components'
 
-export default function FinishListButton() {
+export function FinishListButton() {
     const [loading, setLoading] = useState(false)
     const [creationLoading, setCreationLoading] = useState(false)
     const [showConfirmation, setShowConfirmation] = useState(false)
     const deleteList = useSetAtom(deleteListAtom)
     const createList = useSetAtom(createListAtom)
+    const canBeClosed = useAtomValue(listCanBeClosedAtom)
 
     const onClick = async () => {
         setLoading(true)
-        const ok = await deleteList(false)
-        if (ok) {
-            await createNewList()
+        if (canBeClosed) {
+            const ok = await deleteList(false)
+            if (ok) {
+                await createNewList()
+            }
         }
         else {
             setShowConfirmation(true)

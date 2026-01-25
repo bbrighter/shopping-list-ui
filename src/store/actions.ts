@@ -1,41 +1,43 @@
 import { atom } from 'jotai'
 
-import { api, isAPIError } from '../api/api'
+import { api } from '../api/api'
+import { apiWrapper } from './apiWrapper'
 import { etagAtom, piidAtom } from './atoms.app'
-import { itemsAtom, listIdAtom, productsAtom, resetPollingAtom } from './atoms.items'
-import { handleException } from './error'
+import { itemsAtom, itemsLoadedAtom, listIdAtom, productsAtom, resetPollingAtom } from './atoms.items'
 import { itemAtom } from './selectors'
 import { type Item, type Product, respToData, respToItem } from './types'
 
 export const fetchDataAtom = atom(null, async (get, set) => {
     const piid = get(piidAtom)
     if (!piid) return
-    try {
-        const ifNoneMatch = get(etagAtom)
-        const resp = await api.GetMoments(piid, { IfNoneMatch: ifNoneMatch })
-        const { listId, items, products, etag } = respToData(resp)
-        set(listIdAtom, listId)
-        set(itemsAtom, items)
-        set(productsAtom, products)
-        set(etagAtom, etag)
-    }
-    catch (error) {
-        if (isAPIError(error) && error.status == 304) {
-            return
-        }
-        if (isAPIError(error) && error.status == 404) {
+
+    const ifNoneMatch = get(etagAtom)
+    const promise = api.GetMoments(piid, { IfNoneMatch: ifNoneMatch })
+    const resp = await apiWrapper(promise, { methodName: 'Daten holen', supressStatusCodes: [304] })
+    if (!resp.ok) {
+        if (resp.statusCode == 404) {
             const resp = await api.PostList(piid)
             set(listIdAtom, resp.id)
             return
         }
-        handleException(error, 'Daten holen')
+        return
     }
+    const { listId, items, products, etag } = respToData(resp.resp)
+    set(listIdAtom, listId)
+    set(itemsAtom, items)
+    set(itemsLoadedAtom, true)
+    set(productsAtom, products)
+    set(etagAtom, etag)
 })
 
 export const createListAtom = atom(null, async (get, set) => {
     const piid = get(piidAtom)
-    const resp = await api.PostList(piid)
-    set(listIdAtom, resp.id)
+    const promise = api.PostList(piid)
+    const resp = await apiWrapper(promise, { methodName: 'Liste erstellen' })
+    if (!resp.ok) {
+        return
+    }
+    set(listIdAtom, resp.resp.id)
     set(itemsAtom, [])
     set(resetPollingAtom, v => v + 1)
 })
@@ -47,14 +49,13 @@ export const checkItemAtom = atom(null, async (get, set, id: number) => {
     const checkedItem = { ...item, checked: !item.checked }
     const newItems = get(itemsAtom).map(it => it.id == id ? checkedItem : it)
     set(itemsAtom, newItems)
-    try {
-        await api.CheckItem(piid, id, { checked: !item.checked })
-        set(resetPollingAtom, v => v + 1)
-    }
-    catch (e) {
-        handleException(e, 'Eintrag checken')
+    const promise = api.CheckItem(piid, id, { checked: !item.checked })
+    const resp = await apiWrapper(promise, { methodName: 'Eintrag checken' })
+    if (!resp.ok) {
         set(itemsAtom, previousItems)
+        return
     }
+    set(resetPollingAtom, v => v + 1)
 })
 
 const debounceTimer = new Map<number, number>()
@@ -71,12 +72,10 @@ export const changeItemQuantityAtom = atom(null, async (get, set, id: number, ne
     const existing = debounceTimer.get(id)
     if (existing) clearTimeout(existing)
     const timeout = window.setTimeout(async () => {
-        try {
-            debounceTimer.delete(id)
-            await api.PatchItem(piid, id, { quantity: newQuantity ?? 0 })
-        }
-        catch (e) {
-            handleException(e, 'Anzahl ändern')
+        debounceTimer.delete(id)
+        const promise = api.PatchItem(piid, id, { quantity: newQuantity ?? 0 })
+        const resp = await apiWrapper(promise, { methodName: 'Anzahl ändern' })
+        if (!resp.ok) {
             set(itemsAtom, previousItems)
         }
     }, 500)
@@ -106,7 +105,10 @@ const postItem = async (args: PostItemParams): Promise<{ item: Item, product?: P
 
 export const postItemAtom = atom(null, async (get, set, args: { id: number } | { name: string }) => {
     const piid = get(piidAtom)
-    const { item, product } = await postItem({ piid: piid, listId: get(listIdAtom), ...args })
+    const promise = postItem({ piid: piid, listId: get(listIdAtom), ...args })
+    const resp = await apiWrapper(promise, { methodName: 'Neuer Eintrag' })
+    if (!resp.ok) return
+    const { item, product } = resp.resp
     if (product) {
         set(productsAtom, prev => [...prev, product])
     }
@@ -122,29 +124,25 @@ export const deleteItemAtom = atom(null, async (get, set, id: number) => {
     const originalItems = get(itemsAtom)
     const newItems = get(itemsAtom).filter(it => it.id != id)
     set(itemsAtom, newItems)
-    try {
-        await api.DeleteItem(piid, id)
-    }
-    catch (e) {
-        handleException(e, 'Eintrag löschen')
+
+    const promise = api.DeleteItem(piid, id)
+    const resp = await apiWrapper(promise, { methodName: 'Eintrag löschen' })
+    if (!resp.ok) {
         set(itemsAtom, originalItems)
+        return
     }
     set(resetPollingAtom, v => v + 1)
 })
 
 export const deleteListAtom = atom(null, async (get, set, force: boolean) => {
     const piid = get(piidAtom)
-    try {
-        const listId = get(listIdAtom)
-        await api.DeleteList(piid, listId, { Force: force })
-        set(resetPollingAtom, v => v + 1)
-        return true
-    }
-    catch (e) {
-        if (isAPIError(e) && e.status == 400 && e.message.includes('unchecked items exist')) {
-            return false
-        }
-        handleException(e, 'Liste löschen')
+    const listId = get(listIdAtom)
+
+    const promise = api.DeleteList(piid, listId, { Force: force })
+    const resp = await apiWrapper(promise, { methodName: 'Liste löschen', supressStatusCodes: [400] })
+    if (!resp.ok) {
         return false
     }
+    set(resetPollingAtom, v => v + 1)
+    return true
 })

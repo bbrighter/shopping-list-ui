@@ -1,8 +1,8 @@
 import { getDefaultStore } from 'jotai'
-import { expect, test } from 'vitest'
+import { describe, expect, it, test } from 'vitest'
 
 import { itemsAtom, productsAtom } from './atoms.items'
-import { itemAtom, itemsWithNamesAtom, productsNotInUseAtom } from './selectors'
+import { itemAtom, itemsWithNamesAtom, listCanBeClosedAtom, productsNotInUseAtom } from './selectors'
 
 test('items with names', () => {
     const store = getDefaultStore()
@@ -36,4 +36,28 @@ test('products not in use atom', () => {
     const productsNotInUse = store.get(productsNotInUseAtom)
     expect(productsNotInUse).toHaveLength(1)
     expect(productsNotInUse[0].id).toBe(2)
+})
+
+describe('list can be closed atom', () => {
+    it('can be closed', () => {
+        const store = getDefaultStore()
+        store.set(itemsAtom, [
+            { id: 1, productId: 1, checked: true },
+            { id: 2, productId: 2, checked: true },
+        ])
+
+        const canBeClosed = store.get(listCanBeClosedAtom)
+        expect(canBeClosed).toBeTruthy()
+    })
+
+    it('cannot be closed', () => {
+        const store = getDefaultStore()
+        store.set(itemsAtom, [
+            { id: 1, productId: 1, checked: true },
+            { id: 2, productId: 2, checked: false },
+        ])
+
+        const canBeClosed = store.get(listCanBeClosedAtom)
+        expect(canBeClosed).toBeFalsy()
+    })
 })
