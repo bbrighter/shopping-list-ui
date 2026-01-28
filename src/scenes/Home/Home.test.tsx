@@ -8,6 +8,7 @@ import { Toaster } from 'sonner'
 import { describe, expect, it, vi } from 'vitest'
 
 import { server } from '../../__tests__/setupTest'
+import { getMomentsHandler } from '../../__tests__/shoppingListHandler'
 import { api } from '../../api/api'
 import { type APIError, ErrCode } from '../../api/generatedApi'
 import { piidAtom } from '../../store/atoms.app'
@@ -49,6 +50,7 @@ describe('home page', () => {
 
         const listItem1 = await findListItem('prod1')
         expect(within(listItem1).getByText('3')).toBeInTheDocument()
+        expect(screen.queryByRole('img')).not.toBeInTheDocument()
     })
 
     it('Check and uncheck', async () => {
@@ -198,5 +200,14 @@ describe('home page', () => {
 
         const clipboardText = await navigator.clipboard.readText()
         expect(clipboardText).toContain('Fehler mit Statuscode 400 bei: Daten holen')
+    })
+
+    it('empty list placeholder is shown', async () => {
+        server.use(getMomentsHandler(HttpResponse.json({ listId: 1, items: [], products: [] }, { headers: { ETag: '123' } })))
+
+        render(<HomeProvider />)
+
+        const img = await screen.findByRole('img')
+        expect(img).toBeInTheDocument()
     })
 })
