@@ -19,17 +19,14 @@ export function ItemInput() {
     const [loading, setLoading] = useState(false)
 
     const submitAndReset = async (v: string | Option) => {
-        try {
-            if (typeof (v) == 'string') {
-                await addItem({ name: v })
-            }
-            if (typeof (v) == 'object' && 'id' in v && typeof (v.id) == 'number') {
-                await addItem({ id: v.id })
-            }
-            setValue(null)
-            setInputValue('')
+        if (typeof (v) == 'string') {
+            await addItem({ name: v })
         }
-        catch { /* empty */ }
+        if (typeof (v) == 'object' && 'id' in v && typeof (v.id) == 'number') {
+            await addItem({ id: v.id })
+        }
+        setValue(null)
+        setInputValue('')
     }
 
     const onChange = async (_: React.SyntheticEvent, v: string | Option | null, reason: AutocompleteChangeReason) => {
@@ -69,12 +66,12 @@ export function ItemInput() {
                 <TextField
                     {...params}
                     slotProps={{
+                        ...params.slotProps,
                         input: {
-                            ...params.InputProps,
+                            ...params.slotProps.input,
                             endAdornment: (
                                 <Fragment>
                                     {loading ? <CircularProgress color="inherit" size={20} /> : null}
-                                    {params.InputProps.endAdornment}
                                 </Fragment>
                             ),
                         },
