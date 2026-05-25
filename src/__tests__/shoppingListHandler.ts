@@ -24,7 +24,7 @@ export const postListHandler = () => (http.post('/piid/:piid/list', () => (HttpR
 ))))
 
 export const postListItemHandler = () => (http.post('/piid/:piid/list/:listId/item', () => (HttpResponse.json(
-    { id: 3, checked: false, productId: 3 } satisfies shoppinglist.ItemResponse,
+    { id: 3, checked: false, productId: 4 } satisfies shoppinglist.ItemResponse,
 ))))
 
 export const postListItemByIdHandler = () => (http.post('/piid/:piid/list/:listId/item/:itemId', () => (HttpResponse.json(

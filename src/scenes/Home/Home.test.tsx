@@ -107,18 +107,32 @@ describe('home page', () => {
         })
     })
 
-    it.skip('Create new item by name', async () => {
+    it('Create new item by name', async () => {
         const spy = vi.spyOn(api, 'PostItemByName')
         render(<HomeProvider />)
 
         const combobox = await screen.findByRole('combobox')
-        await userEvent.type(combobox, 'new item{enter}')
+        await userEvent.type(combobox, 'new item')
+        await userEvent.keyboard('{Enter}')
 
         const newItem = await screen.findByText('new item')
         expect(newItem).toBeInTheDocument()
         expect(newItem.closest('li')).toBeInTheDocument()
 
         expect(spy).toHaveBeenCalledWith('68a06340-c811-4820-bb18-fbe750f24f4a', 2, { name: 'new item' })
+    })
+
+    it('Create existing item again shows error', async () => {
+        const spy = vi.spyOn(api, 'PostItemByName')
+        render(<HomeProvider />)
+
+        const combobox = await screen.findByRole('combobox')
+        await userEvent.type(combobox, 'prod1')
+        await userEvent.keyboard('{Enter}')
+
+        expect(screen.getByText('Eintrag existiert schon')).toBeInTheDocument()
+
+        expect(spy).not.toHaveBeenCalled()
     })
 
     it('Create item based on existing product', async () => {
