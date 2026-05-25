@@ -1,10 +1,10 @@
 import Box from '@mui/material/Box'
 import { useAtomValue } from 'jotai'
 
-import { noItemsAtom } from '../../../store'
+import { itemsAtom, itemsLoadedAtom } from '../../../store/items/atoms'
 
 export const NoData = () => {
-    const noItemsFound = useAtomValue(noItemsAtom)
+    const noItemsFound = useNoDataFound()
 
     if (noItemsFound) {
         return (
@@ -20,4 +20,10 @@ export const NoData = () => {
     else {
         return (<></>)
     }
+}
+
+const useNoDataFound = () => {
+    const numberOfItems = useAtomValue(itemsAtom).length
+    const loaded = useAtomValue(itemsLoadedAtom)
+    return loaded && numberOfItems == 0
 }

@@ -1,6 +1,7 @@
+/* v8 ignore file -- @preserve */
 import { http, HttpResponse } from 'msw'
 
-import type { entity } from '../api/generatedApi'
+import type { entity } from '../api/api'
 
 export const authHandlers = (url: string) => ([
     http.get(url + '/permissions', () => (HttpResponse.json({

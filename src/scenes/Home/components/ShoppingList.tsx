@@ -1,7 +1,7 @@
 import { useAtomValue } from 'jotai'
 import { SwipeableList, Type } from 'react-swipeable-list'
 
-import { itemsWithNamesAtom } from '../../../store'
+import { itemsWithNamesAtom } from '../../../store/selectors'
 import { ShoppingListItem } from './ShoppingListItem'
 
 export const ShoppingList = () => {

@@ -9,11 +9,11 @@ import ListItemText from '@mui/material/ListItemText'
 import { useSetAtom } from 'jotai'
 import { LeadingActions, SwipeableListItem, SwipeAction, TrailingActions } from 'react-swipeable-list'
 
-import { checkItemAtom, deleteItemAtom, type Item } from '../../../store'
+import { checkItemAtom, deleteItemAtom } from '../../../store'
 import ItemCheckBox from './ItemCheckBox'
 import ItemSecondaryAction from './ItemSecondaryAction'
 
-export const ShoppingListItem = ({ it }: { it: Item }) => {
+export const ShoppingListItem = ({ it }: { it: { checked: boolean, id: number, quantity?: number | null, productName?: string } }) => {
     const check = useSetAtom(checkItemAtom)
     const deleteItem = useSetAtom(deleteItemAtom)
 

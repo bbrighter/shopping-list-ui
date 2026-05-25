@@ -2,15 +2,15 @@ import Checkbox from '@mui/material/Checkbox'
 import ListItemIcon from '@mui/material/ListItemIcon'
 import { useSetAtom } from 'jotai'
 
-import { checkItemAtom, type Item } from '../../../store'
+import { checkItemAtom } from '../../../store'
 
-export default function ItemCheckBox(props: { item: Item }) {
+export default function ItemCheckBox(props: { item: { checked: boolean, id: number } }) {
     const checkItem = useSetAtom(checkItemAtom)
-    const checked = props.item.checked
+    const { checked, id } = props.item
 
     return (
         <ListItemIcon>
-            <Checkbox onClick={() => checkItem(props.item.id)} checked={checked} />
+            <Checkbox onClick={() => checkItem(id)} checked={checked} />
         </ListItemIcon>
     )
 }

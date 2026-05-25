@@ -2,9 +2,9 @@ import Button from '@mui/material/Button'
 import ButtonGroup from '@mui/material/ButtonGroup'
 import { useSetAtom } from 'jotai'
 
-import { changeItemQuantityAtom, type Item } from '../../../store'
+import { changeItemQuantityAtom } from '../../../store'
 
-export default function ItemSecondaryAction(props: { item: Item }) {
+export default function ItemSecondaryAction(props: { item: { id: number, quantity?: number | null } }) {
     const updateItem = useSetAtom(changeItemQuantityAtom)
     const item = props.item
 
