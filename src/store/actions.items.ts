@@ -113,7 +113,7 @@ export const deleteListAtom = atom(null, async (get, set, force: boolean) => {
     const listId = get(listIdAtom)
 
     const promise = api.DeleteList(piid, listId, { Force: force })
-    const resp = await apiWrapper(promise, { methodName: 'Liste löschen', supressStatusCodes: [400] })
+    const resp = await apiWrapper(promise, { methodName: 'Liste löschen', suppressStatusCodes: [400] })
     if (!resp.ok) {
         return false
     }

@@ -5,12 +5,12 @@ import { isAPIError } from '../api/api'
 type ApiWrapperOptions = {
     loadingDelayMs?: number
     methodName?: string
-    supressStatusCodes?: Array<number>
+    suppressStatusCodes?: Array<number>
 }
 
 type ApiReponse<T> = { ok: true, resp: T } | { ok: false, statusCode: number }
 
-export const apiWrapper = async <T>(promise: Promise<T>, { loadingDelayMs = 1000, methodName = 'Api call', supressStatusCodes = [] }: ApiWrapperOptions): Promise<ApiReponse<T>> => {
+export const apiWrapper = async <T>(promise: Promise<T>, { loadingDelayMs = 1000, methodName = 'Api call', suppressStatusCodes = [] }: ApiWrapperOptions): Promise<ApiReponse<T>> => {
     let loadingToastId: null | string | number = null
 
     const timer = setTimeout(() => {
@@ -21,7 +21,7 @@ export const apiWrapper = async <T>(promise: Promise<T>, { loadingDelayMs = 1000
         return { ok: true, resp: await promise }
     }
     catch (e) {
-        return { ok: false, statusCode: handleException(e, methodName, supressStatusCodes) }
+        return { ok: false, statusCode: handleException(e, methodName, suppressStatusCodes) }
     }
     finally {
         clearTimeout(timer)
@@ -31,10 +31,10 @@ export const apiWrapper = async <T>(promise: Promise<T>, { loadingDelayMs = 1000
     }
 }
 
-const handleException = (e: unknown, method: string, supressStatusCodes?: Array<number>): number => {
+const handleException = (e: unknown, method: string, suppressStatusCodes?: Array<number>): number => {
     let showError = false
     if (isAPIError(e)) {
-        if (supressStatusCodes?.includes(e.status)) {
+        if (suppressStatusCodes?.includes(e.status)) {
             return e.status
         }
         switch (e.status) {

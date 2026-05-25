@@ -3,10 +3,12 @@ import CircularProgress from '@mui/material/CircularProgress'
 import TextField from '@mui/material/TextField'
 import { useAtomValue, useSetAtom } from 'jotai'
 import { Fragment, useState } from 'react'
+import { toast } from 'sonner'
 
 import { postItemByIdAtom, postItemByNameAtom } from '../../../store'
 import { itemsAtom } from '../../../store/items/atoms'
 import { productsAtom } from '../../../store/products/atoms'
+import { itemsWithNamesAtom } from '../../../store/selectors'
 
 type Option = {
     id?: number
@@ -15,6 +17,7 @@ type Option = {
 
 export function ItemInput() {
     const products = useProductsNotAlreadyUsed()
+    const items = useAtomValue(itemsWithNamesAtom)
     const addItemById = useSetAtom(postItemByIdAtom)
     const addItemByName = useSetAtom(postItemByNameAtom)
     const [value, setValue] = useState<Option | null>(null)
@@ -34,29 +37,40 @@ export function ItemInput() {
 
     const onChange = async (_: React.SyntheticEvent, v: string | Option | null, reason: AutocompleteChangeReason) => {
         if (v == null) return
+
         setLoading(true)
-        switch (reason) {
-            case 'selectOption':
-                if (typeof (v) == 'object' && 'id' in v && typeof (v.id) == 'number') {
-                    await submitAndReset(v)
-                    setLoading(false)
+        try {
+            switch (reason) {
+                case 'selectOption': {
+                    if (typeof (v) == 'object' && 'id' in v && typeof (v.id) == 'number') {
+                        await submitAndReset(v)
+                    }
+                    return
                 }
-                break
-            case 'createOption':
-                if (typeof (v) == 'string') {
-                    await submitAndReset(v)
-                    setLoading(false)
+
+                case 'createOption': {
+                    if (typeof (v) !== 'string') return
+
+                    const trimmed = v.trim()
+
+                    const alreadyExists = items.some(i => i.productName === trimmed)
+                    if (alreadyExists) {
+                        toast.info('Eintrag existiert schon')
+                        return
+                    }
+
+                    await submitAndReset(trimmed)
+                    return
                 }
-                break
-            case 'clear':
-                setValue(null)
-                setInputValue('')
-                setLoading(false)
-                break
-            default:
-                setValue(null)
-                setInputValue('')
-                setLoading(false)
+
+                case 'clear':
+                default:
+                    setValue(null)
+                    setInputValue('')
+            }
+        }
+        finally {
+            setLoading(false)
         }
     }
 
