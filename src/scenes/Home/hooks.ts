@@ -1,12 +1,37 @@
-import { useAtomValue } from 'jotai'
+import { useAtomValue, useSetAtom } from 'jotai'
 import { useEffect, useRef } from 'react'
 
-import { pollingStateAtom } from '../../../store'
+import { fetchItemsAtom } from '../../store/actions.items'
+import { fetchProductsAtom } from '../../store/actions.products'
+import { piidAtom } from '../../store/atoms.app'
+import { itemsVersionAtom, resetPollingAtom } from '../../store/items/atoms'
+import { productsVersionAtom } from '../../store/products/atoms'
+
+export const useItemGetter = () => {
+    const piid = useAtomValue(piidAtom)
+    const itemsVersion = useAtomValue(itemsVersionAtom)
+    const getItems = useSetAtom(fetchItemsAtom)
+
+    useEffect(() => {
+        getItems()
+    }, [itemsVersion, piid, getItems])
+}
+
+export const useProductGetter = () => {
+    const piid = useAtomValue(piidAtom)
+    const productsVersion = useAtomValue(productsVersionAtom)
+    const getProducts = useSetAtom(fetchProductsAtom)
+
+    useEffect(() => {
+        getProducts()
+    }, [productsVersion, piid, getProducts])
+}
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const usePolling = (callback: () => Promise<void>, interval: number, deps: Array<any>) => {
-    const resetPolling = useAtomValue(pollingStateAtom)
+    const resetPolling = useAtomValue(resetPollingAtom)
     const callbackRef = useRef(callback)
+    const piid = useAtomValue(piidAtom)
 
     useEffect(() => {
         callbackRef.current = callback
@@ -35,7 +60,7 @@ const usePolling = (callback: () => Promise<void>, interval: number, deps: Array
             document.removeEventListener('visibilitychange', handleVisibilityChange)
         }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [resetPolling, interval, ...deps])
+    }, [resetPolling, piid, interval, ...deps])
 }
 
 export default usePolling

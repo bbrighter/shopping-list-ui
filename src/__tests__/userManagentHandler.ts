@@ -1,6 +1,7 @@
+/* v8 ignore file -- @preserve */
 import { http, HttpResponse } from 'msw'
 
-import type { authentication } from '../api/generatedApi'
+import type { authentication } from '../api/api'
 
 export const userManagementHandlers = (url: string) => ([
     http.get(url + '/users', () => (HttpResponse.json({

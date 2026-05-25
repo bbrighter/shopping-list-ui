@@ -2,44 +2,24 @@ import { atom } from 'jotai'
 
 import { api } from '../api/api'
 import { apiWrapper } from './apiWrapper'
-import { etagAtom, piidAtom } from './atoms.app'
-import { itemsAtom, itemsLoadedAtom, listIdAtom, productsAtom, resetPollingAtom } from './atoms.items'
+import { piidAtom } from './atoms.app'
+import { itemsAtom, itemsLoadedAtom, listIdAtom, resetPollingAtom } from './items/atoms'
+import { respToItem, respToList } from './items/types'
+import { productsAtom } from './products/atoms'
 import { itemAtom } from './selectors'
-import { type Item, type Product, respToData, respToItem } from './types'
 
-export const fetchDataAtom = atom(null, async (get, set) => {
+export const fetchItemsAtom = atom(null, async (get, set) => {
     const piid = get(piidAtom)
     if (!piid) return
 
-    const ifNoneMatch = get(etagAtom)
-    const promise = api.GetMoments(piid, { IfNoneMatch: ifNoneMatch })
-    const resp = await apiWrapper(promise, { methodName: 'Daten holen', supressStatusCodes: [304] })
-    if (!resp.ok) {
-        if (resp.statusCode == 404) {
-            const resp = await api.PostList(piid)
-            set(listIdAtom, resp.id)
-            return
-        }
-        return
-    }
-    const { listId, items, products, etag } = respToData(resp.resp)
+    const promise = api.PostOrGetList(piid)
+    const resp = await apiWrapper(promise, { methodName: 'Liste holen' })
+    if (!resp.ok) return
+
+    const { listId, items } = respToList(resp.resp)
     set(listIdAtom, listId)
     set(itemsAtom, items)
     set(itemsLoadedAtom, true)
-    set(productsAtom, products)
-    set(etagAtom, etag)
-})
-
-export const createListAtom = atom(null, async (get, set) => {
-    const piid = get(piidAtom)
-    const promise = api.PostList(piid)
-    const resp = await apiWrapper(promise, { methodName: 'Liste erstellen' })
-    if (!resp.ok) {
-        return
-    }
-    set(listIdAtom, resp.resp.id)
-    set(itemsAtom, [])
-    set(resetPollingAtom, v => v + 1)
 })
 
 export const checkItemAtom = atom(null, async (get, set, id: number) => {
@@ -49,7 +29,7 @@ export const checkItemAtom = atom(null, async (get, set, id: number) => {
     const checkedItem = { ...item, checked: !item.checked }
     const newItems = get(itemsAtom).map(it => it.id == id ? checkedItem : it)
     set(itemsAtom, newItems)
-    const promise = api.CheckItem(piid, id, { checked: !item.checked })
+    const promise = api.PatchItem(piid, id, { checked: !item.checked })
     const resp = await apiWrapper(promise, { methodName: 'Eintrag checken' })
     if (!resp.ok) {
         set(itemsAtom, previousItems)
@@ -85,36 +65,30 @@ export const changeItemQuantityAtom = atom(null, async (get, set, id: number, ne
     set(resetPollingAtom, v => v + 1)
 })
 
-type PostItemParams = { piid: string, listId: number, id: number } | { piid: string, listId: number, name: string }
-
-const postItem = async (args: PostItemParams): Promise<{ item: Item, product?: Product }> => {
-    const { listId, piid } = args
-    let item = {} as Item
-    let product
-    if ('id' in args) {
-        const resp = await api.PostItem(piid, listId, args.id)
-        item = { id: resp.id, checked: false, productId: args.id }
-    }
-    else {
-        const resp = await api.PostItemByName(piid, listId, { name: args.name })
-        item = respToItem(resp)
-        product = { id: item.productId, name: args.name } as Product
-    }
-    return { item: item, product: product }
-}
-
-export const postItemAtom = atom(null, async (get, set, args: { id: number } | { name: string }) => {
+export const postItemByNameAtom = atom(null, async (get, set, args: { name: string }) => {
     const piid = get(piidAtom)
-    const promise = postItem({ piid: piid, listId: get(listIdAtom), ...args })
-    const resp = await apiWrapper(promise, { methodName: 'Neuer Eintrag' })
+    const resp = await apiWrapper(
+        api.PostItemByName(piid, get(listIdAtom), { name: args.name }),
+        { methodName: 'Neuer Eintrag' },
+    )
     if (!resp.ok) return
-    const { item, product } = resp.resp
-    if (product) {
-        set(productsAtom, prev => [...prev, product])
-    }
-    const itemProductName = get(productsAtom).find(p => p.id == item.productId)!.name
-    item.productName = itemProductName
-    const newItems = [...get(itemsAtom), item]
+
+    const newItems = [respToItem(resp.resp), ...get(itemsAtom)]
+    set(itemsAtom, newItems)
+    const newProducts = [...get(productsAtom), { id: resp.resp.productId, name: args.name, archived: false }]
+    set(productsAtom, newProducts)
+    set(resetPollingAtom, v => v + 1)
+})
+
+export const postItemByIdAtom = atom(null, async (get, set, args: { id: number }) => {
+    const piid = get(piidAtom)
+    const resp = await apiWrapper(
+        api.PostItem(piid, get(listIdAtom), args.id),
+        { methodName: 'Neuer Eintrag' },
+    )
+    if (!resp.ok) return
+
+    const newItems = [{ id: resp.resp.id, productId: args.id, checked: false }, ...get(itemsAtom)]
     set(itemsAtom, newItems)
     set(resetPollingAtom, v => v + 1)
 })
@@ -143,6 +117,8 @@ export const deleteListAtom = atom(null, async (get, set, force: boolean) => {
     if (!resp.ok) {
         return false
     }
-    set(resetPollingAtom, v => v + 1)
+
+    set(itemsAtom, [])
+    set(resetPollingAtom, 0)
     return true
 })

@@ -26,7 +26,6 @@ const storage = {
 }
 
 export const piidAtom = atom('')
-export const etagAtom = atom('')
 export const tokenAtom = atomWithStorage('new-token', '', storage)
 export const authApiAtom = atom<AuthApi>(authApi)
 export const userApiAtom = atom<UserAPI>(authApi)

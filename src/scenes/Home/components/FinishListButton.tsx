@@ -7,24 +7,20 @@ import Typography from '@mui/material/Typography'
 import { useAtomValue, useSetAtom } from 'jotai'
 import { useState } from 'react'
 
-import { createListAtom, deleteListAtom, listCanBeClosedAtom } from '../../../store'
+import { deleteListAtom } from '../../../store'
+import { itemsAtom } from '../../../store/items/atoms'
 import { FullSizeLoader } from '../../Components'
 
 export function FinishListButton() {
     const [loading, setLoading] = useState(false)
-    const [creationLoading, setCreationLoading] = useState(false)
     const [showConfirmation, setShowConfirmation] = useState(false)
     const deleteList = useSetAtom(deleteListAtom)
-    const createList = useSetAtom(createListAtom)
-    const canBeClosed = useAtomValue(listCanBeClosedAtom)
+    const canBeClosed = useListCanBeClosed()
 
     const onClick = async () => {
         setLoading(true)
         if (canBeClosed) {
-            const ok = await deleteList(false)
-            if (ok) {
-                await createNewList()
-            }
+            await deleteList(false)
         }
         else {
             setShowConfirmation(true)
@@ -34,23 +30,14 @@ export function FinishListButton() {
 
     const onConfirmDeletion = async () => {
         setLoading(true)
-        const ok = await deleteList(true)
+        await deleteList(true)
         setLoading(false)
-        if (ok) {
-            setShowConfirmation(false)
-            await createNewList()
-        }
-    }
-
-    const createNewList = async () => {
-        setCreationLoading(true)
-        await createList()
-        setCreationLoading(false)
+        setShowConfirmation(false)
     }
 
     return (
         <>
-            <FullSizeLoader open={creationLoading} />
+            <FullSizeLoader open={loading} />
             <Dialog open={showConfirmation}>
                 <DialogTitle>Liste enthält noch Ungekauftes</DialogTitle>
                 <Box sx={{ padding: '2rem' }}>
@@ -70,11 +57,15 @@ export function FinishListButton() {
                         </Button>
                     </ButtonGroup>
                 </Box>
-
             </Dialog>
             <Button loading={loading} onClick={onClick}>
                 Liste abschließen
             </Button>
         </>
     )
+}
+
+const useListCanBeClosed = (): boolean => {
+    const items = useAtomValue(itemsAtom)
+    return items.every(i => i.checked)
 }

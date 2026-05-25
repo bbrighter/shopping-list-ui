@@ -9,7 +9,8 @@ import { Redirect, Route, Switch, useLocation } from 'wouter'
 
 import { PermissionLoader } from './scenes/Components'
 import Home from './scenes/Home/Home'
-import { authApiAtom, piidAtom, useAuthStateAdapter, useUserManagementAdapter } from './store'
+import { useAuthStateAdapter, useUserManagementAdapter } from './store/adapter'
+import { authApiAtom, piidAtom } from './store/atoms.app'
 
 export default function App() {
     const [_, navigate] = useLocation()

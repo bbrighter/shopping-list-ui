@@ -4,7 +4,9 @@ import TextField from '@mui/material/TextField'
 import { useAtomValue, useSetAtom } from 'jotai'
 import { Fragment, useState } from 'react'
 
-import { postItemAtom, productsNotInUseAtom } from '../../../store'
+import { postItemByIdAtom, postItemByNameAtom } from '../../../store'
+import { itemsAtom } from '../../../store/items/atoms'
+import { productsAtom } from '../../../store/products/atoms'
 
 type Option = {
     id?: number
@@ -12,24 +14,22 @@ type Option = {
 }
 
 export function ItemInput() {
-    const products = useAtomValue(productsNotInUseAtom)
-    const addItem = useSetAtom(postItemAtom)
+    const products = useProductsNotAlreadyUsed()
+    const addItemById = useSetAtom(postItemByIdAtom)
+    const addItemByName = useSetAtom(postItemByNameAtom)
     const [value, setValue] = useState<Option | null>(null)
     const [inputValue, setInputValue] = useState('')
     const [loading, setLoading] = useState(false)
 
     const submitAndReset = async (v: string | Option) => {
-        try {
-            if (typeof (v) == 'string') {
-                await addItem({ name: v })
-            }
-            if (typeof (v) == 'object' && 'id' in v && typeof (v.id) == 'number') {
-                await addItem({ id: v.id })
-            }
-            setValue(null)
-            setInputValue('')
+        if (typeof (v) == 'string') {
+            await addItemByName({ name: v })
         }
-        catch { /* empty */ }
+        if (typeof (v) == 'object' && 'id' in v && typeof (v.id) == 'number') {
+            await addItemById({ id: v.id })
+        }
+        setValue(null)
+        setInputValue('')
     }
 
     const onChange = async (_: React.SyntheticEvent, v: string | Option | null, reason: AutocompleteChangeReason) => {
@@ -69,12 +69,12 @@ export function ItemInput() {
                 <TextField
                     {...params}
                     slotProps={{
+                        ...params.slotProps,
                         input: {
-                            ...params.InputProps,
+                            ...params.slotProps.input,
                             endAdornment: (
                                 <Fragment>
                                     {loading ? <CircularProgress color="inherit" size={20} /> : null}
-                                    {params.InputProps.endAdornment}
                                 </Fragment>
                             ),
                         },
@@ -86,7 +86,13 @@ export function ItemInput() {
             inputValue={inputValue}
             onInputChange={(_, v) => setInputValue(v)}
             clearOnBlur
-            loading
+            loading={loading}
         />
     )
+}
+
+const useProductsNotAlreadyUsed = () => {
+    const products = useAtomValue(productsAtom)
+    const items = useAtomValue(itemsAtom)
+    return products.filter(p => !items.some(i => i.productId == p.id)).sort((a, b) => a.name.localeCompare(b.name))
 }

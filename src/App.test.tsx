@@ -5,7 +5,7 @@ import { Router } from 'wouter'
 import { memoryLocation } from 'wouter/memory-location'
 
 import { server } from './__tests__/setupTest'
-import type { entity } from './api/generatedApi'
+import type { shoppinglist } from './api/api'
 import App from './App'
 
 describe('app', () => {
@@ -18,8 +18,7 @@ describe('app', () => {
         server.use(http.get('/piid/:piid/moments', async () => {
             await delay(500)
             return HttpResponse.json(
-                { items: [], listId: 1, products: [], ETag: 'etag' } satisfies entity.MomentsResponse,
-                { headers: { ETag: '123' } },
+                { itemsVersion: 0, productsVersion: 0 } satisfies shoppinglist.MomentsResponse,
             )
         }))
 

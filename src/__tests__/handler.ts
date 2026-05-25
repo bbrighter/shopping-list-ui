@@ -1,3 +1,4 @@
+/* v8 ignore file -- @preserve */
 import { authHandlers } from './authHandler'
 import * as shoppingListHandlers from './shoppingListHandler'
 import { userManagementHandlers } from './userManagentHandler'
@@ -14,6 +15,7 @@ export const handlers = [
     shoppingListHandlers.postListItemByIdHandler(),
     shoppingListHandlers.postListItemHandler(),
     shoppingListHandlers.patchItemHandler(),
+    shoppingListHandlers.getProductsHandler(),
     ...authHandlers(BASE_URL),
     ...userManagementHandlers(BASE_URL_WITH_PIID),
 ]
