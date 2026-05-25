@@ -2,7 +2,7 @@ import Autocomplete, { type AutocompleteChangeReason } from '@mui/material/Autoc
 import CircularProgress from '@mui/material/CircularProgress'
 import TextField from '@mui/material/TextField'
 import { useAtomValue, useSetAtom } from 'jotai'
-import { Fragment, useState } from 'react'
+import { useState } from 'react'
 import { toast } from 'sonner'
 
 import { postItemByIdAtom, postItemByNameAtom } from '../../../store'
@@ -11,9 +11,17 @@ import { productsAtom } from '../../../store/products/atoms'
 import { itemsWithNamesAtom } from '../../../store/selectors'
 
 type Option = {
-    id?: number
+    id: number
     name: string
 }
+
+const isOption = (v: unknown): v is Required<Option> =>
+    typeof v === 'object'
+    && v !== null
+    && 'id' in v
+    && typeof v.id === 'number'
+
+const isNewOption = (v: unknown): v is Required<string> => typeof v === 'string'
 
 export function ItemInput() {
     const products = useProductsNotAlreadyUsed()
@@ -25,10 +33,10 @@ export function ItemInput() {
     const [loading, setLoading] = useState(false)
 
     const submitAndReset = async (v: string | Option) => {
-        if (typeof (v) == 'string') {
+        if (isNewOption(v)) {
             await addItemByName({ name: v })
         }
-        if (typeof (v) == 'object' && 'id' in v && typeof (v.id) == 'number') {
+        if (isOption(v)) {
             await addItemById({ id: v.id })
         }
         setValue(null)
@@ -42,14 +50,14 @@ export function ItemInput() {
         try {
             switch (reason) {
                 case 'selectOption': {
-                    if (typeof (v) == 'object' && 'id' in v && typeof (v.id) == 'number') {
+                    if (isOption(v)) {
                         await submitAndReset(v)
                     }
                     return
                 }
 
                 case 'createOption': {
-                    if (typeof (v) !== 'string') return
+                    if (!isNewOption(v)) return
 
                     const trimmed = v.trim()
 
@@ -78,7 +86,7 @@ export function ItemInput() {
         <Autocomplete
             freeSolo
             options={products}
-            getOptionLabel={o => typeof (o) == 'string' ? o : o.name}
+            getOptionLabel={o => isNewOption(o) ? o : o.name}
             renderInput={params => (
                 <TextField
                     {...params}
@@ -87,9 +95,7 @@ export function ItemInput() {
                         input: {
                             ...params.slotProps.input,
                             endAdornment: (
-                                <Fragment>
-                                    {loading ? <CircularProgress color="inherit" size={20} /> : null}
-                                </Fragment>
+                                <>{loading ? <CircularProgress color="inherit" size={20} /> : null}</>
                             ),
                         },
                     }}
