@@ -5,7 +5,7 @@ import { useAtomValue, useSetAtom } from 'jotai'
 import { useState } from 'react'
 import { toast } from 'sonner'
 
-import { postItemByIdAtom, postItemByNameAtom, selectors } from '../../../store'
+import { postItemByIdAtom, postItemByNameAtom, selectors, updateProductsAtom } from '../../../store'
 import { itemsAtom } from '../../../store/items/atoms'
 
 type Option = {
@@ -24,16 +24,26 @@ const isNewOption = (v: unknown): v is Required<string> => typeof v === 'string'
 export function ItemInput() {
     const products = useProductsNotAlreadyUsed()
     const items = useAtomValue(selectors.items.withNames)
+    const nameIsInUse = useNameIsInUse()
     const addItemById = useSetAtom(postItemByIdAtom)
     const addItemByName = useSetAtom(postItemByNameAtom)
+    const updateProduct = useSetAtom(updateProductsAtom)
     const [value, setValue] = useState<Option | null>(null)
     const [inputValue, setInputValue] = useState('')
     const [loading, setLoading] = useState(false)
 
     const submitAndReset = async (v: string | Option) => {
         if (isNewOption(v)) {
-            await addItemByName({ name: v })
+            const product = nameIsInUse(v)
+            if (!product) {
+                await addItemByName({ name: v })
+            }
+            else {
+                await addItemById({ id: product.id })
+                await updateProduct(product.id, { archive: false })
+            }
         }
+
         if (isOption(v)) {
             await addItemById({ id: v.id })
         }
@@ -113,4 +123,11 @@ const useProductsNotAlreadyUsed = () => {
     const products = useAtomValue(selectors.products.nonArchived)
     const items = useAtomValue(itemsAtom)
     return products.filter(p => !items.some(i => i.productId == p.id)).sort((a, b) => a.name.localeCompare(b.name))
+}
+
+const useNameIsInUse = () => {
+    const allProducts = useAtomValue(selectors.products.sorted)
+    return (name: string) => {
+        return allProducts.find(p => p.name === name)
+    }
 }
