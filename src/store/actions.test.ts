@@ -7,9 +7,10 @@ import { server } from '../__tests__/setupTest'
 import type { shoppinglist } from '../api/api'
 import { changeItemQuantityAtom, checkItemAtom, deleteItemAtom, deleteListAtom, fetchItemsAtom, postItemByIdAtom, postItemByNameAtom } from './actions.items'
 import { fetchMomentsAtom } from './actions.moments'
+import { fetchProductsAtom, removeProductsAtom, updateProductsAtom } from './actions.products'
 import { piidAtom } from './atoms.app'
 import { itemsAtom, itemsVersionAtom, listIdAtom } from './items/atoms'
-import { productsVersionAtom } from './products/atoms'
+import { productsAtom, productsLoadedAtom, productsVersionAtom } from './products/atoms'
 
 describe('actions', () => {
     let store: Store
@@ -173,5 +174,58 @@ describe('moments actions', () => {
 
         expect(store.get(itemsVersionAtom)).toBe(1)
         expect(store.get(productsVersionAtom)).toBe(10)
+    })
+})
+
+describe('product actions', () => {
+    let store: Store
+    beforeEach(() => {
+        store = createStore()
+        store.set(piidAtom, 'piid')
+        store.set(productsVersionAtom, 3)
+        store.set(itemsVersionAtom, 10)
+    })
+
+    it('fetchProductsAtom', async () => {
+        await store.set(fetchProductsAtom)
+
+        expect(store.get(productsLoadedAtom)).toBeTruthy()
+        const products = store.get(productsAtom)
+        expect(products).toHaveLength(4)
+        expect(products).toContainEqual({ id: 1, name: 'prod1', archived: false })
+        expect(products).toContainEqual({ id: 2, name: 'prod2', archived: false })
+        expect(products).toContainEqual({ id: 3, name: 'prod3', archived: false })
+        expect(products).toContainEqual({ id: 4, name: 'archived', archived: true })
+    })
+
+    it('updateProductsAtom, name', async () => {
+        await store.set(fetchProductsAtom)
+
+        await store.set(updateProductsAtom, 1, { name: 'new name' })
+        const product1 = store.get(productsAtom).find(p => p.id === 1)!
+        expect(product1).toBeDefined()
+        expect(product1.name).toBe('new name')
+        expect(product1.archived).toBeFalsy()
+    })
+
+    it('updateProductsAtom, archived', async () => {
+        await store.set(fetchProductsAtom)
+
+        await store.set(updateProductsAtom, 1, { archive: true })
+
+        const product1 = store.get(productsAtom).find(p => p.id === 1)!
+        expect(product1).toBeDefined()
+        expect(product1.name).toBe('prod1')
+        expect(product1.archived).toBeTruthy()
+    })
+
+    it('removeProductsAtom', async () => {
+        await store.set(fetchProductsAtom)
+
+        await store.set(removeProductsAtom, 1)
+
+        const products = store.get(productsAtom)
+        expect(products).toHaveLength(3)
+        expect(products.some(p => p.id === 1)).toBeFalsy()
     })
 })

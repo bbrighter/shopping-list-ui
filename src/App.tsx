@@ -9,6 +9,7 @@ import { Redirect, Route, Switch, useLocation } from 'wouter'
 
 import { PermissionLoader } from './scenes/Components'
 import Home from './scenes/Home/Home'
+import { ProductManagementButton } from './scenes/Home/Management'
 import { useAuthStateAdapter, useUserManagementAdapter } from './store/adapter'
 import { authApiAtom, piidAtom } from './store/atoms.app'
 
@@ -26,7 +27,9 @@ export default function App() {
             <UserManagementProvider adapter={userManagementAdapter}>
                 <AppEffects navigate={navigate} />
                 <PermissionLoader />
-                <CustomAppBar />
+                <CustomAppBar>
+                    <ProductManagementButton />
+                </CustomAppBar>
                 <Switch>
                     <Route path="/login" component={Login} />
                     <Route path="/:piid" component={Home} />
