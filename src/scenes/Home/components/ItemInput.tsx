@@ -1,4 +1,4 @@
-import Autocomplete, { type AutocompleteChangeReason } from '@mui/material/Autocomplete'
+import Autocomplete from '@mui/material/Autocomplete'
 import CircularProgress from '@mui/material/CircularProgress'
 import TextField from '@mui/material/TextField'
 import { useAtomValue, useSetAtom } from 'jotai'
@@ -40,7 +40,9 @@ export function ItemInput() {
             }
             else {
                 await addItemById({ id: product.id })
-                await updateProduct(product.id, { archive: false })
+                if (product.archived) {
+                    await updateProduct(product.id, { archive: false })
+                }
             }
         }
 
@@ -51,38 +53,22 @@ export function ItemInput() {
         setInputValue('')
     }
 
-    const onChange = async (_: React.SyntheticEvent, v: string | Option | null, reason: AutocompleteChangeReason) => {
+    const onChange = async (_: React.SyntheticEvent, v: string | Option | null) => {
         if (v == null) return
 
         setLoading(true)
         try {
-            switch (reason) {
-                case 'selectOption': {
-                    if (isOption(v)) {
-                        await submitAndReset(v)
-                    }
+            if (isOption(v)) {
+                await submitAndReset(v)
+            }
+            if (isNewOption(v)) {
+                const trimmed = v.trim()
+                const alreadyExists = items.some(i => i.productName === trimmed)
+                if (alreadyExists) {
+                    toast.info('Eintrag existiert schon')
                     return
                 }
-
-                case 'createOption': {
-                    if (!isNewOption(v)) return
-
-                    const trimmed = v.trim()
-
-                    const alreadyExists = items.some(i => i.productName === trimmed)
-                    if (alreadyExists) {
-                        toast.info('Eintrag existiert schon')
-                        return
-                    }
-
-                    await submitAndReset(trimmed)
-                    return
-                }
-
-                case 'clear':
-                default:
-                    setValue(null)
-                    setInputValue('')
+                await submitAndReset(trimmed)
             }
         }
         finally {
