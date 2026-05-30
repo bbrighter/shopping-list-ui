@@ -50,6 +50,8 @@ describe('Item input for shopping list', () => {
         await userEvent.type(combobox, 'new item')
         await userEvent.keyboard('{enter}')
 
+        expect(spyPatchProduct).not.toHaveBeenCalled()
+        expect(spyPostItem).not.toHaveBeenCalled()
         expect(spyPostItemByName).toHaveBeenCalled()
     })
 
@@ -62,7 +64,21 @@ describe('Item input for shopping list', () => {
         const product2 = screen.getByText('prod2')
         await userEvent.click(product2)
 
+        expect(spyPatchProduct).not.toHaveBeenCalled()
         expect(spyPostItem).toHaveBeenCalled()
+        expect(spyPostItemByName).not.toHaveBeenCalled()
+    })
+
+    it('adding an existing item by enter', async () => {
+        render(<ItemInput />)
+
+        const combobox = await screen.findByRole('combobox')
+        await userEvent.type(combobox, 'prod2')
+        await userEvent.keyboard('{enter}')
+
+        expect(spyPatchProduct).not.toHaveBeenCalled()
+        expect(spyPostItem).toHaveBeenCalled()
+        expect(spyPostItemByName).not.toHaveBeenCalled()
     })
 
     it('adding an existing, but archived item', async () => {
