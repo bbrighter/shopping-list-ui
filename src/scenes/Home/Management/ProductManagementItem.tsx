@@ -6,6 +6,7 @@ import ListItem from '@mui/material/ListItem'
 import ListItemText from '@mui/material/ListItemText'
 import Typography from '@mui/material/Typography'
 import { useSetAtom } from 'jotai'
+import { useState } from 'react'
 
 import { updateProductsAtom } from '../../../store'
 
@@ -27,13 +28,18 @@ export const ProductManagementItem = (product: ProductProp) => {
 }
 
 const Actions = ({ id, archived }: { id: number, archived: boolean }) => {
+    const [loading, setLoading] = useState(false)
     const updateProduct = useSetAtom(updateProductsAtom)
 
-    const onArchive = () => updateProduct(id, { archive: !archived })
+    const onArchive = async () => {
+        setLoading(true)
+        await updateProduct(id, { archive: !archived })
+        setLoading(false)
+    }
 
     return (
         <ButtonGroup>
-            <IconButton onClick={onArchive}>
+            <IconButton onClick={onArchive} loading={loading}>
                 {archived ? <UnarchiveIcon color="disabled" /> : <ArchiveIcon />}
             </IconButton>
         </ButtonGroup>
