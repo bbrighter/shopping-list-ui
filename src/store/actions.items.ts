@@ -24,7 +24,7 @@ export const fetchItemsAtom = atom(null, async (get, set) => {
 
 export const checkItemAtom = atom(null, async (get, set, id: number) => {
     const piid = get(piidAtom)
-    const item = get(itemAtom)(id)
+    const item = get(itemAtom(id))
     const previousItems = get(itemsAtom)
     const checkedItem = { ...item, checked: !item.checked }
     const newItems = get(itemsAtom).map(it => it.id == id ? checkedItem : it)
@@ -42,7 +42,7 @@ const debounceTimer = new Map<number, number>()
 
 export const changeItemQuantityAtom = atom(null, async (get, set, id: number, newQuantity?: number) => {
     const piid = get(piidAtom)
-    const item = get(itemAtom)(id)
+    const item = get(itemAtom(id))
     const previousItems = get(itemsAtom)
     const newItem = { ...item, quantity: newQuantity }
     const newItems = get(itemsAtom).map(it => it.id == id ? newItem : it)

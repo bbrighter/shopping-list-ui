@@ -1,11 +1,11 @@
 import { useAtomValue } from 'jotai'
 import { SwipeableList, Type } from 'react-swipeable-list'
 
-import { itemsWithNamesAtom } from '../../../store/selectors'
+import { selectors } from '../../../store'
 import { ShoppingListItem } from './ShoppingListItem'
 
 export const ShoppingList = () => {
-    const items = useAtomValue(itemsWithNamesAtom)
+    const items = useAtomValue(selectors.items.withNames)
 
     return (
         <SwipeableList type={Type.ANDROID}>

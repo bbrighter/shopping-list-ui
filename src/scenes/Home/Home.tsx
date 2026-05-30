@@ -7,6 +7,7 @@ import { FinishListButton, ItemInput, ShoppingList } from './components'
 import { NoData } from './components/NoData.tsx'
 import usePolling from './hooks'
 import { useItemGetter, useProductGetter } from './hooks.ts'
+import { ProductManagement } from './Management/ProductManagement.tsx'
 
 export default function Home() {
     const getMoments = useSetAtom(fetchMomentsAtom)
@@ -17,6 +18,7 @@ export default function Home() {
     return (
         <Container sx={{ padding: '2rem' }}>
             <Stack spacing={3}>
+                <ProductManagement />
                 <FinishListButton />
                 <ItemInput />
                 <NoData />

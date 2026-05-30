@@ -5,10 +5,8 @@ import { useAtomValue, useSetAtom } from 'jotai'
 import { useState } from 'react'
 import { toast } from 'sonner'
 
-import { postItemByIdAtom, postItemByNameAtom } from '../../../store'
+import { postItemByIdAtom, postItemByNameAtom, selectors } from '../../../store'
 import { itemsAtom } from '../../../store/items/atoms'
-import { productsAtom } from '../../../store/products/atoms'
-import { itemsWithNamesAtom } from '../../../store/selectors'
 
 type Option = {
     id: number
@@ -25,7 +23,7 @@ const isNewOption = (v: unknown): v is Required<string> => typeof v === 'string'
 
 export function ItemInput() {
     const products = useProductsNotAlreadyUsed()
-    const items = useAtomValue(itemsWithNamesAtom)
+    const items = useAtomValue(selectors.items.withNames)
     const addItemById = useSetAtom(postItemByIdAtom)
     const addItemByName = useSetAtom(postItemByNameAtom)
     const [value, setValue] = useState<Option | null>(null)
@@ -112,7 +110,7 @@ export function ItemInput() {
 }
 
 const useProductsNotAlreadyUsed = () => {
-    const products = useAtomValue(productsAtom)
+    const products = useAtomValue(selectors.products.nonArchived)
     const items = useAtomValue(itemsAtom)
     return products.filter(p => !items.some(i => i.productId == p.id)).sort((a, b) => a.name.localeCompare(b.name))
 }
