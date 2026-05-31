@@ -6,7 +6,6 @@ import { piidAtom } from './atoms.app'
 import { itemsAtom, itemsLoadedAtom, listIdAtom, resetPollingAtom } from './items/atoms'
 import { respToItem, respToList } from './items/types'
 import { productsAtom } from './products/atoms'
-import type { Product } from './products/types'
 import { itemAtom } from './selectors'
 
 export const fetchItemsAtom = atom(null, async (get, set) => {
@@ -77,14 +76,10 @@ export const putItemByNameAtom = atom(null, async (get, set, args: { name: strin
     const newItems = [respToItem(resp.resp), ...get(itemsAtom)]
     set(itemsAtom, newItems)
 
-    let newProducts: Array<Product> = []
     const existingProduct = get(productsAtom).find(p => p.id === resp.resp.productId)
-    if (existingProduct) {
-        newProducts = get(productsAtom).map(p => p.id === resp.resp.productId ? { ...p, archived: false } : p)
-    }
-    else {
-        newProducts = [...get(productsAtom), { id: resp.resp.productId, name: args.name, archived: false }]
-    }
+    const newProducts = existingProduct
+        ? get(productsAtom).map(p => p.id === resp.resp.productId ? { ...p, archived: false } : p)
+        : [...get(productsAtom), { id: resp.resp.productId, name: args.name, archived: false }]
 
     set(productsAtom, newProducts)
     set(resetPollingAtom, v => v + 1)

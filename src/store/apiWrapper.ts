@@ -32,7 +32,6 @@ export const apiWrapper = async <T>(promise: Promise<T>, { loadingDelayMs = 1000
 }
 
 const handleException = (e: unknown, method: string, suppressStatusCodes?: Array<number>): number => {
-    let showError = false
     if (isAPIError(e)) {
         if (suppressStatusCodes?.includes(e.status)) {
             return e.status
@@ -40,25 +39,23 @@ const handleException = (e: unknown, method: string, suppressStatusCodes?: Array
         switch (e.status) {
             case 404:
                 return 404
-            default:
-                showError = true
-        }
-        if (showError) {
-            const title = `Fehler mit Statuscode ${e.status} bei: ${method}`
-            const details = `${title} \n ${e.message} \n ${e.details} \n ${e.stack}`
-            toast.error(
-                title,
-                {
-                    description: e.message,
-                    closeButton: true,
-                    duration: 20_000,
-                    action: {
-                        label: 'Kopieren',
-                        onClick: () => navigator.clipboard.writeText(details),
+            default: {
+                const title = `Fehler mit Statuscode ${e.status} bei: ${method}`
+                const details = `${title} \n ${e.message} \n ${e.details} \n ${e.stack}`
+                toast.error(
+                    title,
+                    {
+                        description: e.message,
+                        closeButton: true,
+                        duration: 20_000,
+                        action: {
+                            label: 'Kopieren',
+                            onClick: () => navigator.clipboard.writeText(details),
+                        },
                     },
-                },
-            )
-            return e.status
+                )
+                return e.status
+            }
         }
     }
     return 500

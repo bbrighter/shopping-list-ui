@@ -42,5 +42,14 @@ export default defineConfig([
 
             '@typescript-eslint/no-unused-vars': 'off',
         },
+        settings: {
+            react: {
+                // version: 'detect',
+                // workaround for eslint-plugin-react compat with eslint 10
+                // change to 'detect' for auto-detection of react version after eslint-plugin-react will support eslint 10+
+                version: '18.3',
+            },
+        },
     },
+
 ])
