@@ -130,7 +130,7 @@ describe('home page', () => {
         await userEvent.type(combobox, 'prod1')
         await userEvent.keyboard('{Enter}')
 
-        expect(screen.getByText('Eintrag existiert schon')).toBeInTheDocument()
+        expect(screen.getByText('prod1 steht schon in der Liste')).toBeInTheDocument()
 
         expect(spy).not.toHaveBeenCalled()
     })
