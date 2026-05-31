@@ -4,6 +4,8 @@ import { getDefaultStore } from 'jotai'
 import type { Store } from 'jotai/vanilla/store'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
+import { server } from '../../../__tests__/setupTest'
+import { itemHandlers } from '../../../__tests__/shoppingListHandler'
 import { api } from '../../../api/api'
 import { piidAtom } from '../../../store/atoms.app'
 import { itemsAtom } from '../../../store/items/atoms'
@@ -29,8 +31,7 @@ describe('Item input for shopping list', () => {
     })
 
     const spyPostItem = vi.spyOn(api, 'PostItem')
-    const spyPostItemByName = vi.spyOn(api, 'PostItemByName')
-    const spyPatchProduct = vi.spyOn(api, 'PatchProduct')
+    const spyPostItemByName = vi.spyOn(api, 'PutItemByName')
 
     it('show correct content', async () => {
         render(<ItemInput />)
@@ -50,9 +51,11 @@ describe('Item input for shopping list', () => {
         await userEvent.type(combobox, 'new item')
         await userEvent.keyboard('{enter}')
 
-        expect(spyPatchProduct).not.toHaveBeenCalled()
         expect(spyPostItem).not.toHaveBeenCalled()
         expect(spyPostItemByName).toHaveBeenCalled()
+
+        expect(store.get(itemsAtom)).toHaveLength(2)
+        expect(store.get(productsAtom)).toHaveLength(4)
     })
 
     it('adding an existing item', async () => {
@@ -64,32 +67,40 @@ describe('Item input for shopping list', () => {
         const product2 = screen.getByText('prod2')
         await userEvent.click(product2)
 
-        expect(spyPatchProduct).not.toHaveBeenCalled()
         expect(spyPostItem).toHaveBeenCalled()
         expect(spyPostItemByName).not.toHaveBeenCalled()
+
+        expect(store.get(itemsAtom)).toHaveLength(2)
+        expect(store.get(productsAtom)).toHaveLength(3)
     })
 
     it('adding an existing item by enter', async () => {
+        server.use(itemHandlers.putItemByName({ id: 3, productId: 2, checked: false }))
         render(<ItemInput />)
 
         const combobox = await screen.findByRole('combobox')
         await userEvent.type(combobox, 'prod2')
         await userEvent.keyboard('{enter}')
 
-        expect(spyPatchProduct).not.toHaveBeenCalled()
-        expect(spyPostItem).toHaveBeenCalled()
-        expect(spyPostItemByName).not.toHaveBeenCalled()
+        expect(spyPostItem).not.toHaveBeenCalled()
+        expect(spyPostItemByName).toHaveBeenCalled()
+
+        expect(store.get(itemsAtom)).toHaveLength(2)
+        expect(store.get(productsAtom)).toHaveLength(3)
     })
 
     it('adding an existing, but archived item', async () => {
+        server.use(itemHandlers.putItemByName({ id: 3, productId: 2, checked: false }))
         render(<ItemInput />)
 
         const combobox = await screen.findByRole('combobox')
         await userEvent.type(combobox, 'archived')
         await userEvent.keyboard('{enter}')
 
-        expect(spyPatchProduct).toHaveBeenCalled()
-        expect(spyPostItem).toHaveBeenCalled()
-        expect(spyPostItemByName).not.toHaveBeenCalled()
+        expect(spyPostItem).not.toHaveBeenCalled()
+        expect(spyPostItemByName).toHaveBeenCalled()
+
+        expect(store.get(itemsAtom)).toHaveLength(2)
+        expect(store.get(productsAtom)).toHaveLength(3)
     })
 })

@@ -219,8 +219,8 @@ export namespace shoppinglist {
             this.PatchItem = this.PatchItem.bind(this)
             this.PatchProduct = this.PatchProduct.bind(this)
             this.PostItem = this.PostItem.bind(this)
-            this.PostItemByName = this.PostItemByName.bind(this)
             this.PostOrGetList = this.PostOrGetList.bind(this)
+            this.PutItemByName = this.PutItemByName.bind(this)
         }
 
         public async DeleteItem(piid: string, itemId: number): Promise<void> {
@@ -266,16 +266,16 @@ export namespace shoppinglist {
             return await resp.json() as IdResponse
         }
 
-        public async PostItemByName(piid: string, listId: number, params: ItemNameParams): Promise<ItemResponse> {
-            // Now make the actual call to the API
-            const resp = await this.baseClient.callTypedAPI("POST", `/piid/${encodeURIComponent(piid)}/list/${encodeURIComponent(listId)}/item`, JSON.stringify(params))
-            return await resp.json() as ItemResponse
-        }
-
         public async PostOrGetList(piid: string): Promise<ListResponse> {
             // Now make the actual call to the API
             const resp = await this.baseClient.callTypedAPI("POST", `/piid/${encodeURIComponent(piid)}/list`)
             return await resp.json() as ListResponse
+        }
+
+        public async PutItemByName(piid: string, listId: number, params: ItemNameParams): Promise<ItemResponse> {
+            // Now make the actual call to the API
+            const resp = await this.baseClient.callTypedAPI("PUT", `/piid/${encodeURIComponent(piid)}/list/${encodeURIComponent(listId)}/item`, JSON.stringify(params))
+            return await resp.json() as ItemResponse
         }
     }
 }

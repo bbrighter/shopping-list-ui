@@ -1,11 +1,12 @@
 import Autocomplete from '@mui/material/Autocomplete'
 import CircularProgress from '@mui/material/CircularProgress'
 import TextField from '@mui/material/TextField'
+import Typography from '@mui/material/Typography'
 import { useAtomValue, useSetAtom } from 'jotai'
 import { useState } from 'react'
 import { toast } from 'sonner'
 
-import { postItemByIdAtom, postItemByNameAtom, selectors, updateProductsAtom } from '../../../store'
+import { postItemByIdAtom, putItemByNameAtom, selectors } from '../../../store'
 import { itemsAtom } from '../../../store/items/atoms'
 
 type Option = {
@@ -24,34 +25,11 @@ const isNewOption = (v: unknown): v is Required<string> => typeof v === 'string'
 export function ItemInput() {
     const products = useProductsNotAlreadyUsed()
     const items = useAtomValue(selectors.items.withNames)
-    const nameIsInUse = useNameIsInUse()
     const addItemById = useSetAtom(postItemByIdAtom)
-    const addItemByName = useSetAtom(postItemByNameAtom)
-    const updateProduct = useSetAtom(updateProductsAtom)
+    const addItemByName = useSetAtom(putItemByNameAtom)
     const [value, setValue] = useState<Option | null>(null)
     const [inputValue, setInputValue] = useState('')
     const [loading, setLoading] = useState(false)
-
-    const submitAndReset = async (v: string | Option) => {
-        if (isNewOption(v)) {
-            const product = nameIsInUse(v)
-            if (!product) {
-                await addItemByName({ name: v })
-            }
-            else {
-                await addItemById({ id: product.id })
-                if (product.archived) {
-                    await updateProduct(product.id, { archive: false })
-                }
-            }
-        }
-
-        if (isOption(v)) {
-            await addItemById({ id: v.id })
-        }
-        setValue(null)
-        setInputValue('')
-    }
 
     const onChange = async (_: React.SyntheticEvent, v: string | Option | null) => {
         if (v == null) return
@@ -59,20 +37,26 @@ export function ItemInput() {
         setLoading(true)
         try {
             if (isOption(v)) {
-                await submitAndReset(v)
+                await addItemById({ id: v.id })
             }
             if (isNewOption(v)) {
                 const trimmed = v.trim()
                 const alreadyExists = items.some(i => i.productName === trimmed)
                 if (alreadyExists) {
-                    toast.info('Eintrag existiert schon')
+                    toast.info(
+                        <Typography>
+                            {`${trimmed} steht schon in der Liste`}
+                        </Typography>,
+                    )
                     return
                 }
-                await submitAndReset(trimmed)
+                await addItemByName({ name: trimmed })
             }
         }
         finally {
             setLoading(false)
+            setValue(null)
+            setInputValue('')
         }
     }
 
@@ -109,11 +93,4 @@ const useProductsNotAlreadyUsed = () => {
     const products = useAtomValue(selectors.products.nonArchived)
     const items = useAtomValue(itemsAtom)
     return products.filter(p => !items.some(i => i.productId == p.id)).sort((a, b) => a.name.localeCompare(b.name))
-}
-
-const useNameIsInUse = () => {
-    const allProducts = useAtomValue(selectors.products.sorted)
-    return (name: string) => {
-        return allProducts.find(p => p.name === name)
-    }
 }

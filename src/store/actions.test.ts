@@ -5,7 +5,7 @@ import { beforeEach, describe, expect, it } from 'vitest'
 
 import { server } from '../__tests__/setupTest'
 import type { shoppinglist } from '../api/api'
-import { changeItemQuantityAtom, checkItemAtom, deleteItemAtom, deleteListAtom, fetchItemsAtom, postItemByIdAtom, postItemByNameAtom } from './actions.items'
+import { changeItemQuantityAtom, checkItemAtom, deleteItemAtom, deleteListAtom, fetchItemsAtom, postItemByIdAtom, putItemByNameAtom } from './actions.items'
 import { fetchMomentsAtom } from './actions.moments'
 import { fetchProductsAtom, removeProductsAtom, updateProductsAtom } from './actions.products'
 import { piidAtom } from './atoms.app'
@@ -80,13 +80,13 @@ describe('actions', () => {
 
             const items = store.get(itemsAtom)
             expect(items).toHaveLength(3)
-            const item3 = items.find(i => i.productId == 3)!
+            const item3 = items.find(i => i.productId == 3)
             expect(item3).toBeDefined()
         })
-        it('post by name', async () => {
+        it('put by name', async () => {
             await store.set(fetchItemsAtom)
 
-            await store.set(postItemByNameAtom, { name: 'new name' })
+            await store.set(putItemByNameAtom, { name: 'new name' })
 
             const items = store.get(itemsAtom)
             expect(items).toHaveLength(3)

@@ -108,7 +108,7 @@ describe('home page', () => {
     })
 
     it('Create new item by name', async () => {
-        const spy = vi.spyOn(api, 'PostItemByName')
+        const spy = vi.spyOn(api, 'PutItemByName')
         render(<HomeProvider />)
 
         const combobox = await screen.findByRole('combobox')
@@ -123,14 +123,14 @@ describe('home page', () => {
     })
 
     it('Create existing item again shows error', async () => {
-        const spy = vi.spyOn(api, 'PostItemByName')
+        const spy = vi.spyOn(api, 'PutItemByName')
         render(<HomeProvider />)
 
         const combobox = await screen.findByRole('combobox')
         await userEvent.type(combobox, 'prod1')
         await userEvent.keyboard('{Enter}')
 
-        expect(screen.getByText('Eintrag existiert schon')).toBeInTheDocument()
+        expect(screen.getByText('prod1 steht schon in der Liste')).toBeInTheDocument()
 
         expect(spy).not.toHaveBeenCalled()
     })
