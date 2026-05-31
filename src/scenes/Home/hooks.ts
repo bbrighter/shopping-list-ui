@@ -38,7 +38,7 @@ const usePolling = (callback: () => Promise<void>, interval: number, deps: Array
     }, [callback])
 
     useEffect(() => {
-        let id: number | null
+        let id: NodeJS.Timeout | null
         const tick = () => callbackRef.current()
 
         const handleVisibilityChange = () => {
