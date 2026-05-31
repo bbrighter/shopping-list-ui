@@ -37,8 +37,8 @@ export const listHandlers = {
 }
 
 export const itemHandlers = {
-    postItemByName: () => (http.post('/piid/:piid/list/:listId/item', () => (HttpResponse.json(
-    { id: 3, checked: false, productId: 5 } satisfies shoppinglist.ItemResponse,
+    putItemByName: (result?: shoppinglist.ItemResponse) => (http.put('/piid/:piid/list/:listId/item', () => (HttpResponse.json(
+        result ?? { id: 3, checked: false, productId: 5 } satisfies shoppinglist.ItemResponse,
     )))),
     postItemById: () => (http.post('/piid/:piid/list/:listId/item/:itemId', () => (HttpResponse.json(
     { id: 3 } satisfies shoppinglist.IdResponse,

@@ -6,6 +6,7 @@ import { piidAtom } from './atoms.app'
 import { itemsAtom, itemsLoadedAtom, listIdAtom, resetPollingAtom } from './items/atoms'
 import { respToItem, respToList } from './items/types'
 import { productsAtom } from './products/atoms'
+import type { Product } from './products/types'
 import { itemAtom } from './selectors'
 
 export const fetchItemsAtom = atom(null, async (get, set) => {
@@ -65,17 +66,26 @@ export const changeItemQuantityAtom = atom(null, async (get, set, id: number, ne
     set(resetPollingAtom, v => v + 1)
 })
 
-export const postItemByNameAtom = atom(null, async (get, set, args: { name: string }) => {
+export const putItemByNameAtom = atom(null, async (get, set, args: { name: string }) => {
     const piid = get(piidAtom)
     const resp = await apiWrapper(
-        api.PostItemByName(piid, get(listIdAtom), { name: args.name }),
+        api.PutItemByName(piid, get(listIdAtom), { name: args.name }),
         { methodName: 'Neuer Eintrag' },
     )
     if (!resp.ok) return
 
     const newItems = [respToItem(resp.resp), ...get(itemsAtom)]
     set(itemsAtom, newItems)
-    const newProducts = [...get(productsAtom), { id: resp.resp.productId, name: args.name, archived: false }]
+
+    let newProducts: Array<Product> = []
+    const existingProduct = get(productsAtom).find(p => p.id === resp.resp.productId)
+    if (existingProduct) {
+        newProducts = get(productsAtom).map(p => p.id === resp.resp.productId ? { ...p, archived: false } : p)
+    }
+    else {
+        newProducts = [...get(productsAtom), { id: resp.resp.productId, name: args.name, archived: false }]
+    }
+
     set(productsAtom, newProducts)
     set(resetPollingAtom, v => v + 1)
 })

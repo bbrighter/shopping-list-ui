@@ -11,7 +11,7 @@ export const handlers = [
     listHandlers.delete(),
     momentsHandler.get(),
     itemHandlers.postItemById(),
-    itemHandlers.postItemByName(),
+    itemHandlers.putItemByName(),
     itemHandlers.delete(),
     itemHandlers.patch(),
     itemHandlers.patchCheck(),

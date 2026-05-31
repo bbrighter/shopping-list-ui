@@ -108,7 +108,7 @@ describe('home page', () => {
     })
 
     it('Create new item by name', async () => {
-        const spy = vi.spyOn(api, 'PostItemByName')
+        const spy = vi.spyOn(api, 'PutItemByName')
         render(<HomeProvider />)
 
         const combobox = await screen.findByRole('combobox')
@@ -123,7 +123,7 @@ describe('home page', () => {
     })
 
     it('Create existing item again shows error', async () => {
-        const spy = vi.spyOn(api, 'PostItemByName')
+        const spy = vi.spyOn(api, 'PutItemByName')
         render(<HomeProvider />)
 
         const combobox = await screen.findByRole('combobox')
