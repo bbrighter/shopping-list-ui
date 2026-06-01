@@ -1,7 +1,9 @@
 {
-    "editor.formatOnSave": true,
-    "editor.defaultFormatter": "dbaeumer.vscode-eslint",
-    "[typescriptreact]": {
-        "editor.defaultFormatter": "dbaeumer.vscode-eslint"
-    }
+	"editor.defaultFormatter": "biomejs.biome",
+	"[typescriptreact]": {
+		"editor.defaultFormatter": "biomejs.biome"
+	},
+	"editor.codeActionsOnSave": {
+		"source.fixAll.biome": "explicit"
+	}
 }

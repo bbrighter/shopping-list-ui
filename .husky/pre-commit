@@ -1,4 +1,4 @@
 pnpm run knip
-pnpm run lint
+pnpm biome check --staged
 pnpm run dependencies:ci
 pnpm run tsc

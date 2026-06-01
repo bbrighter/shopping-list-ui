@@ -1,29 +1,36 @@
-import { fetcher } from './fetcher'
-import Client, { type ClientOptions, Environment, Local } from './generatedApi'
+import { fetcher } from "./fetcher";
+import Client, { type ClientOptions, Environment, Local } from "./generatedApi";
 
 const getStageURL = (): string => {
-    const hostname = new URL(window.location.href).hostname
-    if (hostname.includes('shopping-list-ui-git')) {
-        return Environment('staging')
-    }
-    else {
-        return Environment('prod')
-    }
-}
+	const hostname = new URL(window.location.href).hostname;
+	if (hostname.includes("shopping-list-ui-git")) {
+		return Environment("staging");
+	} else {
+		return Environment("prod");
+	}
+};
 
-const baseUrl = import.meta.env.MODE === 'test'
-    ? ''
-    : import.meta.env.PROD
-        ? getStageURL()
-        : Local
+const baseUrl =
+	import.meta.env.MODE === "test"
+		? ""
+		: import.meta.env.PROD
+			? getStageURL()
+			: Local;
 
 const options: ClientOptions = {
-    fetcher: fetcher,
-    auth: () => ({ Token: window.localStorage.getItem('new-token') || '' }),
-}
+	fetcher: fetcher,
+	auth: () => ({ Token: window.localStorage.getItem("new-token") || "" }),
+};
 
-const baseClient = new Client(baseUrl, options)
-export const authApi = baseClient.authentication
-export const api = baseClient.shoppinglist
+const baseClient = new Client(baseUrl, options);
+export const authApi = baseClient.authentication;
+export const api = baseClient.shoppinglist;
 
-export { APIError, authentication, type entity, ErrCode, isAPIError, type shoppinglist } from './generatedApi'
+export {
+	APIError,
+	authentication,
+	ErrCode,
+	type entity,
+	isAPIError,
+	type shoppinglist,
+} from "./generatedApi";
