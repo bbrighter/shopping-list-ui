@@ -1,2 +1,2 @@
-export * from './ProductManagement'
-export * from './ProductManagementButton'
+export * from "./ProductManagement";
+export * from "./ProductManagementButton";

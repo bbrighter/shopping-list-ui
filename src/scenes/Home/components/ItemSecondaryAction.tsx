@@ -1,39 +1,39 @@
-import Button from '@mui/material/Button'
-import ButtonGroup from '@mui/material/ButtonGroup'
-import { useSetAtom } from 'jotai'
+import Button from "@mui/material/Button";
+import ButtonGroup from "@mui/material/ButtonGroup";
+import { useSetAtom } from "jotai";
 
-import { changeItemQuantityAtom } from '../../../store'
+import { changeItemQuantityAtom } from "../../../store";
 
-export default function ItemSecondaryAction(props: { item: { id: number, quantity?: number | null } }) {
-    const updateItem = useSetAtom(changeItemQuantityAtom)
-    const item = props.item
+export default function ItemSecondaryAction(props: {
+	item: { id: number; quantity?: number | null };
+}) {
+	const updateItem = useSetAtom(changeItemQuantityAtom);
+	const item = props.item;
 
-    const onIncrease = () => {
-        const newQuantity = item.quantity ? item.quantity + 1 : 1
-        updateItem(item.id, newQuantity)
-    }
-    const onDecrease = () => {
-        const newQuantity = !item.quantity || item.quantity == 1 ? undefined : item.quantity - 1
-        updateItem(item.id, newQuantity)
-    }
+	const onIncrease = () => {
+		const newQuantity = item.quantity ? item.quantity + 1 : 1;
+		updateItem(item.id, newQuantity);
+	};
+	const onDecrease = () => {
+		const newQuantity =
+			!item.quantity || item.quantity === 1 ? undefined : item.quantity - 1;
+		updateItem(item.id, newQuantity);
+	};
 
-    const disableDecrease = item?.quantity == undefined || item?.quantity == 0
+	const disableDecrease = item?.quantity === undefined || item?.quantity === 0;
 
-    return (
-        <ButtonGroup>
-            <Button
-                onClick={onIncrease}
-                data-testid="increaseItemQuantity"
-            >
-                +
-            </Button>
-            <Button
-                onClick={onDecrease}
-                disabled={disableDecrease}
-                data-testid="decreaseItemQuantity"
-            >
-                -
-            </Button>
-        </ButtonGroup>
-    )
+	return (
+		<ButtonGroup>
+			<Button onClick={onIncrease} data-testid="increaseItemQuantity">
+				+
+			</Button>
+			<Button
+				onClick={onDecrease}
+				disabled={disableDecrease}
+				data-testid="decreaseItemQuantity"
+			>
+				-
+			</Button>
+		</ButtonGroup>
+	);
 }

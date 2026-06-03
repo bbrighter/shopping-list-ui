@@ -1,30 +1,30 @@
 /* v8 ignore file -- @preserve */
-import '@testing-library/jest-dom'
+import "@testing-library/jest-dom";
 
-import * as matchers from '@testing-library/jest-dom/matchers'
-import { setupServer } from 'msw/node'
-import { afterAll, afterEach, beforeAll, beforeEach, expect, vi } from 'vitest'
+import * as matchers from "@testing-library/jest-dom/matchers";
+import { setupServer } from "msw/node";
+import { afterAll, afterEach, beforeAll, beforeEach, expect, vi } from "vitest";
 
-import { handlers } from './handler'
+import { handlers } from "./handler";
 
-expect.extend(matchers)
+expect.extend(matchers);
 
-export const server = setupServer(...handlers)
+export const server = setupServer(...handlers);
 
 beforeAll(() => {
-    server.listen({ onUnhandledRequest: 'error' })
-    // // Uncomment to allow debugging more easily
-    // server.events.on('request:start', ({ request }) => {
-    //     console.log('➡️', request.method, request.url)
-    //     console.log('   Headers:', Object.fromEntries(request.headers.entries()))
-    // })
-})
+	server.listen({ onUnhandledRequest: "error" });
+	// // Uncomment to allow debugging more easily
+	// server.events.on('request:start', ({ request }) => {
+	//     console.log('➡️', request.method, request.url)
+	//     console.log('   Headers:', Object.fromEntries(request.headers.entries()))
+	// })
+});
 beforeEach(() => {
-    window.localStorage.setItem('new-token', '123')
-    vi.resetAllMocks()
-})
+	window.localStorage.setItem("new-token", "123");
+	vi.resetAllMocks();
+});
 afterEach(() => {
-    server.resetHandlers()
-    window.localStorage.clear()
-})
-afterAll(() => server.close())
+	server.resetHandlers();
+	window.localStorage.clear();
+});
+afterAll(() => server.close());

@@ -1,2 +1,2 @@
-export * from './FullSizeLoader'
-export * from './PermissionLoader'
+export * from "./FullSizeLoader";
+export * from "./PermissionLoader";
