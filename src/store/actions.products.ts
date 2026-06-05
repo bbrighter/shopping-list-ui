@@ -47,7 +47,7 @@ export const updateProductsAtom = atom(
 				: p,
 		);
 		set(productsAtom, next);
-		set(productsVersionAtom, get(productsVersionAtom) + 1);
+		set(productsVersionAtom, get(productsVersionAtom) ?? 0 + 1);
 	},
 );
 
@@ -63,5 +63,5 @@ export const removeProductsAtom = atom(null, async (get, set, id: number) => {
 	const prev = get(productsAtom);
 	const next = prev.filter((p) => p.id !== id);
 	set(productsAtom, next);
-	set(productsVersionAtom, get(productsVersionAtom) + 1);
+	set(productsVersionAtom, get(productsVersionAtom) ?? 0 + 1);
 });

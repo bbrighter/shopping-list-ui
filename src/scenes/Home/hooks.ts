@@ -1,9 +1,9 @@
 import { useAtomValue, useSetAtom } from "jotai";
 import type React from "react";
 import { useEffect, useRef } from "react";
-
 import { fetchItemsAtom } from "../../store/actions.items";
 import { fetchProductsAtom } from "../../store/actions.products";
+import { piidAtom } from "../../store/atoms.app";
 import { itemsVersionAtom, resetPollingAtom } from "../../store/items/atoms";
 import { productsVersionAtom } from "../../store/products/atoms";
 
@@ -34,34 +34,39 @@ const usePolling = (
 ) => {
 	const resetPolling = useAtomValue(resetPollingAtom);
 	const callbackRef = useRef(callback);
+	const piid = useAtomValue(piidAtom);
 
+	// biome-ignore lint/correctness/useExhaustiveDependencies: Must run when PIID is set
 	useEffect(() => {
-		callbackRef.current = callback;
-	}, [callback]);
+		const fn = () => callbackRef.current();
+		let timeout: NodeJS.Timeout | null;
 
-	useEffect(() => {
-		let id: NodeJS.Timeout | null;
-		const tick = () => callbackRef.current();
+		const start = () => {
+			if (resetPolling === 0) fn();
+			timeout = setInterval(fn, interval);
+		};
 
-		const handleVisibilityChange = () => {
-			if (document.visibilityState === "visible") {
-				if (resetPolling === 0) tick();
-				id = setInterval(tick, interval);
-			} else if (id) {
-				clearInterval(id);
-				id = null;
+		const stop = () => {
+			if (timeout) {
+				clearInterval(timeout);
+				timeout = null;
 			}
 		};
 
+		const handleVisibilityChange = () => {
+			if (document.visibilityState === "visible") start();
+			else stop();
+		};
+
 		document.addEventListener("visibilitychange", handleVisibilityChange);
-		handleVisibilityChange();
+
+		if (document.visibilityState === "visible") start();
 
 		return () => {
-			if (id) clearInterval(id);
+			stop();
 			document.removeEventListener("visibilitychange", handleVisibilityChange);
 		};
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [resetPolling, interval, ...deps]);
+	}, [resetPolling, piid, interval, ...deps]);
 };
 
 export default usePolling;
