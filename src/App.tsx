@@ -70,6 +70,8 @@ const usePiidLocation = () => {
 	const [, navigate] = useLocation();
 	const api = useAtomValue(authApiAtom);
 
+	console.log("usePiidLocation", piid);
+
 	// biome-ignore lint/correctness/useExhaustiveDependencies: <Must navigate if API is available (true???)>
 	useEffect(() => {
 		if (piid) {
