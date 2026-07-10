@@ -8,7 +8,6 @@ import { productsVersionAtom } from "./products/atoms";
 
 export const fetchMomentsAtom = atom(null, async (get, set) => {
 	const piid = get(piidAtom);
-	console.log("piid is: ", piid);
 	if (!piid) return;
 
 	const resp = await apiWrapper(api.GetMoments(piid), {

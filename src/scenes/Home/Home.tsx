@@ -12,7 +12,6 @@ import { ProductManagement } from "./Management/ProductManagement.tsx";
 export default function Home() {
 	const getMoments = useSetAtom(fetchMomentsAtom);
 	useEffect(() => {
-		console.log("get moments");
 		getMoments();
 	}, [getMoments]);
 	usePolling(getMoments, 4000, []);
