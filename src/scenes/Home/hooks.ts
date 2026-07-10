@@ -11,8 +11,8 @@ export const useItemGetter = () => {
 	const itemsVersion = useAtomValue(itemsVersionAtom);
 	const getItems = useSetAtom(fetchItemsAtom);
 
-	// biome-ignore lint/correctness/useExhaustiveDependencies: <A new itemVersion should trigger a request>
 	useEffect(() => {
+		if (itemsVersion === undefined) return;
 		getItems();
 	}, [itemsVersion, getItems]);
 };
@@ -21,8 +21,8 @@ export const useProductGetter = () => {
 	const productsVersion = useAtomValue(productsVersionAtom);
 	const getProducts = useSetAtom(fetchProductsAtom);
 
-	// biome-ignore lint/correctness/useExhaustiveDependencies: <A new product version should trigger a request>
 	useEffect(() => {
+		if (productsVersion === undefined) return;
 		getProducts();
 	}, [productsVersion, getProducts]);
 };
