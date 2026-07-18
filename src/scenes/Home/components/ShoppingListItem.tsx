@@ -14,7 +14,11 @@ import {
 	TrailingActions,
 } from "react-swipeable-list";
 
-import { checkItemAtom, deleteItemAtom } from "../../../store";
+import {
+	changeItemQuantityAtom,
+	checkItemAtom,
+	deleteItemAtom,
+} from "../../../store";
 import ItemCheckBox from "./ItemCheckBox";
 import ItemSecondaryAction from "./ItemSecondaryAction";
 
@@ -30,6 +34,7 @@ export const ShoppingListItem = ({
 }) => {
 	const check = useSetAtom(checkItemAtom);
 	const deleteItem = useSetAtom(deleteItemAtom);
+	const updateItem = useSetAtom(changeItemQuantityAtom);
 
 	const checkButtonIcon = it.checked ? (
 		<UnpublishedIcon />
@@ -53,13 +58,31 @@ export const ShoppingListItem = ({
 		</TrailingActions>
 	);
 
+	const onIncrease = () => {
+		const newQuantity = it.quantity ? it.quantity + 1 : 1;
+		updateItem(it.id, newQuantity);
+	};
+	const onDecrease = () => {
+		const newQuantity =
+			!it.quantity || it.quantity === 1 ? undefined : it.quantity - 1;
+		updateItem(it.id, newQuantity);
+	};
+
 	return (
 		<SwipeableListItem
 			threshold={0.5}
 			leadingActions={leadingActions()}
 			trailingActions={trailingActions()}
 		>
-			<ListItem secondaryAction={<ItemSecondaryAction item={it} />}>
+			<ListItem
+				secondaryAction={
+					<ItemSecondaryAction
+						item={it}
+						onDecrease={onDecrease}
+						onIncrease={onIncrease}
+					/>
+				}
+			>
 				<ItemCheckBox item={it} />
 				<ListItemText
 					primary={it.productName || "no name"}
