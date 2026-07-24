@@ -14,6 +14,8 @@ const BASE_URL_WITH_PIID = `${BASE_URL}/piid/:piid`;
 export const handlers = [
 	listHandlers.post(),
 	listHandlers.delete(),
+	listHandlers.deleteForce(),
+	listHandlers.deleteMove(),
 	momentsHandler.get(),
 	itemHandlers.postItemById(),
 	itemHandlers.putItemByName(),

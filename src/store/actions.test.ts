@@ -9,7 +9,9 @@ import {
 	changeItemQuantityAtom,
 	checkItemAtom,
 	deleteItemAtom,
+	deleteListAndMoveItemsAtom,
 	deleteListAtom,
+	deleteListForceAtom,
 	fetchItemsAtom,
 	postItemByIdAtom,
 	putItemByNameAtom,
@@ -124,18 +126,43 @@ describe("actions", () => {
 		it("delete", async () => {
 			await store.set(fetchItemsAtom);
 
-			const ok = await store.set(deleteListAtom, false);
+			const ok = await store.set(deleteListAtom);
 
-			expect(ok).toBeFalsy();
+			expect(ok).toBeTruthy();
 			const listId = store.get(listIdAtom);
 			expect(listId).toBe(2);
 		});
+
+		it("delete responds with 400", async () => {
+			server.use(
+				http.delete("/piid/:piid/list/:listId", () =>
+					HttpResponse.json({}, { status: 400 }),
+				),
+			);
+
+			const ok = await store.set(deleteListAtom);
+
+			expect(ok).toBeFalsy();
+		});
+
 		it("with force", async () => {
 			await store.set(fetchItemsAtom);
 
-			const ok = await store.set(deleteListAtom, true);
+			await store.set(deleteListForceAtom);
 
-			expect(ok).toBeTruthy();
+			const listId = store.get(listIdAtom);
+			expect(listId).toBe(2);
+		});
+		it("with moving items", async () => {
+			await store.set(fetchItemsAtom);
+
+			await store.set(deleteListAndMoveItemsAtom);
+
+			const listId = store.get(listIdAtom);
+			expect(listId).toBe(2);
+			const items = store.get(itemsAtom);
+			expect(items).toHaveLength(1);
+			expect(items[0].id).toBe(1);
 		});
 	});
 });
