@@ -179,6 +179,7 @@ describe("home page", () => {
 	});
 
 	it("Deleting with all items checked possible without modal", async () => {
+		const spy = vi.spyOn(api, "DeleteList");
 		server.use(
 			http.post("/piid/:piid/list", () =>
 				HttpResponse.json({
@@ -193,24 +194,20 @@ describe("home page", () => {
 		const finishListButton = await screen.findByText("Liste abschließen");
 		await userEvent.click(finishListButton);
 
+		expect(spy).toHaveBeenCalledOnce();
 		expect(screen.queryByText("prod1")).toBeNull();
 		expect(screen.queryByRole("dialog")).toBeNull;
 	});
 
 	it("Force delete list", async () => {
-		const spy = vi.spyOn(api, "PostOrGetList");
+		const spy = vi.spyOn(api, "ForceDeleteList");
 		render(<HomeProvider />);
 
 		const finishListButton = await screen.findByText("Liste abschließen");
 		await userEvent.click(finishListButton);
 
 		expect(await screen.findByRole("dialog")).toBeVisible();
-		const keepButton = screen.getByText("Abbrechen");
 
-		await userEvent.click(keepButton);
-		expect(screen.getByRole("dialog")).not.toBeVisible();
-
-		await userEvent.click(finishListButton);
 		const deleteButton = await screen.findByText("Einträge löschen");
 		await userEvent.click(deleteButton);
 		expect(await screen.findByRole("dialog")).not.toBeVisible();
@@ -219,6 +216,7 @@ describe("home page", () => {
 	});
 
 	it("Delete list and move items", async () => {
+		const spy = vi.spyOn(api, "DeleteListAndMoveItems");
 		render(<HomeProvider />);
 
 		const finishListButton = await screen.findByText("Liste abschließen");
@@ -229,6 +227,7 @@ describe("home page", () => {
 		expect(await screen.findByRole("dialog")).not.toBeVisible();
 
 		expect(screen.getByText("prod1")).toBeVisible();
+		expect(spy).toHaveBeenCalledOnce();
 	});
 
 	it("patch quantity", async () => {

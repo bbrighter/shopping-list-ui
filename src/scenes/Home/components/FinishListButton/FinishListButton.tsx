@@ -6,31 +6,32 @@ import DialogTitle from "@mui/material/DialogTitle";
 import { useTheme } from "@mui/material/styles";
 import Typography from "@mui/material/Typography";
 import useMediaQuery from "@mui/material/useMediaQuery";
-import { useAtomValue, useSetAtom } from "jotai";
 import { useState } from "react";
-import {
-	deleteListAndMoveItemsAtom,
-	deleteListAtom,
-	deleteListForceAtom,
-} from "../../../store";
-import { itemsAtom } from "../../../store/items/atoms";
-import { FullSizeLoader } from "../../Components";
+import { FullSizeLoader } from "../../../Components";
 
-export function FinishListButton() {
+type FinishListButtonProps = {
+	allItemsChecked: boolean;
+	onDelete: () => Promise<boolean>;
+	onForceDelete: () => Promise<void>;
+	onDeleteAndMove: () => Promise<void>;
+};
+
+export function FinishListButton({
+	allItemsChecked,
+	onDelete,
+	onForceDelete,
+	onDeleteAndMove,
+}: FinishListButtonProps) {
 	const [loading, setLoading] = useState(false);
 	const [showConfirmation, setShowConfirmation] = useState(false);
-	const deleteList = useSetAtom(deleteListAtom);
-	const forceDeleteList = useSetAtom(deleteListForceAtom);
-	const deleteListAndMoveItems = useSetAtom(deleteListAndMoveItemsAtom);
-	const canBeClosed = useListCanBeClosed();
 
 	const theme = useTheme();
 	const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
 	const onClick = async () => {
 		setLoading(true);
-		if (canBeClosed) {
-			await deleteList();
+		if (allItemsChecked) {
+			await onDelete();
 		} else {
 			setShowConfirmation(true);
 		}
@@ -39,14 +40,14 @@ export function FinishListButton() {
 
 	const onConfirmDeletion = async () => {
 		setLoading(true);
-		await forceDeleteList();
+		await onForceDelete();
 		setLoading(false);
 		setShowConfirmation(false);
 	};
 
 	const onMoveItemsAndDelete = async () => {
 		setLoading(true);
-		await deleteListAndMoveItems();
+		await onDeleteAndMove();
 		setLoading(false);
 		setShowConfirmation(false);
 	};
@@ -58,6 +59,7 @@ export function FinishListButton() {
 				<DialogTitle>Liste enthält noch Ungekauftes</DialogTitle>
 				<Box sx={{ padding: "2rem" }}>
 					<Typography>
+						{isMobile ? "isMobile" : "not mobile"}
 						Nicht alle Gegenstände sind abgehakt. Wie sollen wir weitermachen?
 					</Typography>
 					<ButtonGroup
@@ -85,8 +87,3 @@ export function FinishListButton() {
 		</>
 	);
 }
-
-const useListCanBeClosed = (): boolean => {
-	const items = useAtomValue(itemsAtom);
-	return items.every((i) => i.checked);
-};
