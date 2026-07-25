@@ -2,12 +2,10 @@ import Autocomplete from "@mui/material/Autocomplete";
 import CircularProgress from "@mui/material/CircularProgress";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
-import { useAtomValue, useSetAtom } from "jotai";
 import { useState } from "react";
 import { toast } from "sonner";
-
-import { postItemByIdAtom, putItemByNameAtom, selectors } from "../../../store";
-import { itemsAtom } from "../../../store/items/atoms";
+import type { Item } from "../../../../store/items/types";
+import type { Product } from "../../../../store/products/types";
 
 type Option = {
 	id: number;
@@ -20,11 +18,19 @@ const isOption = (v: unknown): v is Required<Option> =>
 const isNewOption = (v: unknown): v is Required<string> =>
 	typeof v === "string";
 
-export function ItemInput() {
-	const products = useProductsNotAlreadyUsed();
-	const items = useAtomValue(selectors.items.withNames);
-	const addItemById = useSetAtom(postItemByIdAtom);
-	const addItemByName = useSetAtom(putItemByNameAtom);
+type ItemInputProps = {
+	products: Array<Product>;
+	items: Array<Item & { productName?: string }>;
+	addItemById: ({ id }: { id: number }) => Promise<void>;
+	addItemByName: ({ name }: { name: string }) => Promise<void>;
+};
+
+export function ItemInput({
+	products,
+	items,
+	addItemById,
+	addItemByName,
+}: ItemInputProps) {
 	const [value, setValue] = useState<Option | null>(null);
 	const [inputValue, setInputValue] = useState("");
 	const [loading, setLoading] = useState(false);
@@ -90,11 +96,3 @@ export function ItemInput() {
 		/>
 	);
 }
-
-const useProductsNotAlreadyUsed = () => {
-	const products = useAtomValue(selectors.products.nonArchived);
-	const items = useAtomValue(itemsAtom);
-	return products
-		.filter((p) => !items.some((i) => i.productId === p.id))
-		.sort((a, b) => a.name.localeCompare(b.name));
-};

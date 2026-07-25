@@ -55,11 +55,13 @@ export function FinishListButton({
 	return (
 		<>
 			<FullSizeLoader open={loading} />
-			<Dialog open={showConfirmation}>
+			<Dialog
+				open={showConfirmation}
+				onClose={() => setShowConfirmation(false)}
+			>
 				<DialogTitle>Liste enthält noch Ungekauftes</DialogTitle>
 				<Box sx={{ padding: "2rem" }}>
 					<Typography>
-						{isMobile ? "isMobile" : "not mobile"}
 						Nicht alle Gegenstände sind abgehakt. Wie sollen wir weitermachen?
 					</Typography>
 					<ButtonGroup

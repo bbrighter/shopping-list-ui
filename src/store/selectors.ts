@@ -20,6 +20,8 @@ export const itemsWithNamesAtom = atom((get) => {
 	return itemsWithProducts;
 });
 
+export type ItemsWithProductNames = ReturnType<typeof itemsWithNamesAtom.read>;
+
 export const sortedProductsAtom = atom((get) => {
 	return [...get(productsAtom)].sort((a, b) => a.name.localeCompare(b.name));
 });
