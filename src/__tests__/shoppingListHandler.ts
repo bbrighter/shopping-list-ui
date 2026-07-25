@@ -27,15 +27,16 @@ export const listHandlers = {
 				],
 			} satisfies shoppinglist.ListResponse),
 		),
-
 	delete: () =>
-		http.delete("/piid/:piid/list/:listId", ({ request }) => {
-			const { force } = parseQuery(request);
-
-			if (force === "true") {
-				return HttpResponse.json({});
-			}
-			return HttpResponse.json({}, { status: 400 });
+		http.delete("/piid/:piid/list/:listId", () => HttpResponse.json({})),
+	deleteForce: () =>
+		http.delete("/piid/:piid/list/:listId/force", () => HttpResponse.json({})),
+	deleteMove: () =>
+		http.delete("/piid/:piid/list/:listId/move", () => {
+			return HttpResponse.json({
+				id: 2,
+				items: [{ id: 1, checked: false, productId: 1, quantity: 3 }],
+			} satisfies shoppinglist.ListResponse);
 		}),
 };
 
@@ -62,10 +63,6 @@ export const itemHandlers = {
 	patch: () =>
 		http.patch("/piid/:piid/item/:itemId", () => HttpResponse.json({})),
 };
-
-function parseQuery(request: Request) {
-	return Object.fromEntries(new URL(request.url).searchParams.entries());
-}
 
 export const productHandlers = {
 	list: () =>

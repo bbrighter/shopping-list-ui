@@ -7,7 +7,11 @@ import Typography from "@mui/material/Typography";
 import { useAtomValue, useSetAtom } from "jotai";
 import { useState } from "react";
 
-import { deleteListAtom } from "../../../store";
+import {
+	deleteListAndMoveItemsAtom,
+	deleteListAtom,
+	deleteListForceAtom,
+} from "../../../store";
 import { itemsAtom } from "../../../store/items/atoms";
 import { FullSizeLoader } from "../../Components";
 
@@ -15,12 +19,14 @@ export function FinishListButton() {
 	const [loading, setLoading] = useState(false);
 	const [showConfirmation, setShowConfirmation] = useState(false);
 	const deleteList = useSetAtom(deleteListAtom);
+	const forceDeleteList = useSetAtom(deleteListForceAtom);
+	const deleteListAndMoveItems = useSetAtom(deleteListAndMoveItemsAtom);
 	const canBeClosed = useListCanBeClosed();
 
 	const onClick = async () => {
 		setLoading(true);
 		if (canBeClosed) {
-			await deleteList(false);
+			await deleteList();
 		} else {
 			setShowConfirmation(true);
 		}
@@ -29,7 +35,14 @@ export function FinishListButton() {
 
 	const onConfirmDeletion = async () => {
 		setLoading(true);
-		await deleteList(true);
+		await forceDeleteList();
+		setLoading(false);
+		setShowConfirmation(false);
+	};
+
+	const onMoveItemsAndDelete = async () => {
+		setLoading(true);
+		await deleteListAndMoveItems();
 		setLoading(false);
 		setShowConfirmation(false);
 	};
@@ -44,7 +57,15 @@ export function FinishListButton() {
 						Nicht alle Gegenstände sind abgehakt. Liste löschen und Gegenstände
 						entfernen?
 					</Typography>
-					<ButtonGroup variant="contained" sx={{ pt: "1rem" }} color="inherit">
+					<ButtonGroup
+						variant="contained"
+						sx={{ pt: "1rem" }}
+						color="inherit"
+						disabled={loading}
+					>
+						<Button color="primary" onClick={onMoveItemsAndDelete}>
+							Einträge verschieben
+						</Button>
 						<Button color="error" onClick={onConfirmDeletion}>
 							Dennoch löschen
 						</Button>

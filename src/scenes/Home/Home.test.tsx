@@ -8,7 +8,7 @@ import { Toaster } from "sonner";
 import { describe, expect, it, vi } from "vitest";
 
 import { server } from "../../__tests__/setupTest";
-import { type APIError, api, ErrCode } from "../../api/api";
+import { type APIError, api, ErrCode, type shoppinglist } from "../../api/api";
 import { piidAtom } from "../../store/atoms.app";
 import Home from "./Home";
 
@@ -178,25 +178,58 @@ describe("home page", () => {
 		);
 	});
 
-	// it('Delete list', async () => {
-	//     const spy = vi.spyOn(api, 'PostList')
-	//     render(<HomeProvider />)
+	it("Deleting with all items checked possible without modal", async () => {
+		server.use(
+			http.post("/piid/:piid/list", () =>
+				HttpResponse.json({
+					id: 2,
+					items: [{ id: 2, checked: true, productId: 2 }],
+				} satisfies shoppinglist.ListResponse),
+			),
+		);
 
-	//     const finishListButton = await screen.findByText('Liste abschließen')
-	//     await userEvent.click(finishListButton)
+		render(<HomeProvider />);
 
-	//     expect(await screen.findByRole('dialog')).toBeVisible()
-	//     const keepButton = screen.getByText('Behalten')
+		const finishListButton = await screen.findByText("Liste abschließen");
+		await userEvent.click(finishListButton);
 
-	//     await userEvent.click(keepButton)
-	//     expect(screen.getByRole('dialog')).not.toBeVisible()
+		expect(screen.queryByText("prod1")).toBeNull();
+		expect(screen.queryByRole("dialog")).toBeNull;
+	});
 
-	//     await userEvent.click(finishListButton)
-	//     const deleteButton = await screen.findByText('Dennoch löschen')
-	//     await userEvent.click(deleteButton)
-	//     expect(await screen.findByRole('dialog')).not.toBeVisible()
-	//     expect(spy).toHaveBeenCalledOnce()
-	// })
+	it("Force delete list", async () => {
+		const spy = vi.spyOn(api, "PostOrGetList");
+		render(<HomeProvider />);
+
+		const finishListButton = await screen.findByText("Liste abschließen");
+		await userEvent.click(finishListButton);
+
+		expect(await screen.findByRole("dialog")).toBeVisible();
+		const keepButton = screen.getByText("Behalten");
+
+		await userEvent.click(keepButton);
+		expect(screen.getByRole("dialog")).not.toBeVisible();
+
+		await userEvent.click(finishListButton);
+		const deleteButton = await screen.findByText("Dennoch löschen");
+		await userEvent.click(deleteButton);
+		expect(await screen.findByRole("dialog")).not.toBeVisible();
+		expect(spy).toHaveBeenCalledOnce();
+		expect(screen.queryByText("prod1")).toBeNull();
+	});
+
+	it("Delete list and move items", async () => {
+		render(<HomeProvider />);
+
+		const finishListButton = await screen.findByText("Liste abschließen");
+		await userEvent.click(finishListButton);
+
+		const deleteButton = await screen.findByText("Einträge verschieben");
+		await userEvent.click(deleteButton);
+		expect(await screen.findByRole("dialog")).not.toBeVisible();
+
+		expect(screen.getByText("prod1")).toBeVisible();
+	});
 
 	it("patch quantity", async () => {
 		render(<HomeProvider />);

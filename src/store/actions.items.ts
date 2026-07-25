@@ -6,6 +6,7 @@ import { piidAtom } from "./atoms.app";
 import {
 	itemsAtom,
 	itemsLoadedAtom,
+	itemsVersionAtom,
 	listIdAtom,
 	resetPollingAtom,
 } from "./items/atoms";
@@ -139,11 +140,11 @@ export const deleteItemAtom = atom(null, async (get, set, id: number) => {
 	set(resetPollingAtom, (v) => v + 1);
 });
 
-export const deleteListAtom = atom(null, async (get, set, force: boolean) => {
+export const deleteListAtom = atom(null, async (get, set) => {
 	const piid = get(piidAtom);
 	const listId = get(listIdAtom);
 
-	const promise = api.DeleteList(piid, listId, { Force: force });
+	const promise = api.DeleteList(piid, listId);
 	const resp = await apiWrapper(promise, {
 		methodName: "Liste löschen",
 		suppressStatusCodes: [400],
@@ -155,4 +156,30 @@ export const deleteListAtom = atom(null, async (get, set, force: boolean) => {
 	set(itemsAtom, []);
 	set(resetPollingAtom, 0);
 	return true;
+});
+
+export const deleteListForceAtom = atom(null, async (get, set) => {
+	const piid = get(piidAtom);
+	const listId = get(listIdAtom);
+
+	await apiWrapper(api.ForceDeleteList(piid, listId), {
+		methodName: "Liste löschen",
+	});
+	set(itemsAtom, []);
+	set(resetPollingAtom, 0);
+});
+
+export const deleteListAndMoveItemsAtom = atom(null, async (get, set) => {
+	const piid = get(piidAtom);
+	const listId = get(listIdAtom);
+
+	const resp = await apiWrapper(api.DeleteListAndMoveItems(piid, listId), {
+		methodName: "Liste löschen",
+	});
+
+	if (!resp.ok) return;
+	const { listId: newListId, items } = respToList(resp.resp);
+	set(itemsAtom, items);
+	set(listIdAtom, newListId);
+	set(itemsVersionAtom, (v) => (v ?? 0) + 1);
 });
