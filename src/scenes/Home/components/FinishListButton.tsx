@@ -3,10 +3,11 @@ import Button from "@mui/material/Button";
 import ButtonGroup from "@mui/material/ButtonGroup";
 import Dialog from "@mui/material/Dialog";
 import DialogTitle from "@mui/material/DialogTitle";
+import { useTheme } from "@mui/material/styles";
 import Typography from "@mui/material/Typography";
+import useMediaQuery from "@mui/material/useMediaQuery";
 import { useAtomValue, useSetAtom } from "jotai";
 import { useState } from "react";
-
 import {
 	deleteListAndMoveItemsAtom,
 	deleteListAtom,
@@ -22,6 +23,9 @@ export function FinishListButton() {
 	const forceDeleteList = useSetAtom(deleteListForceAtom);
 	const deleteListAndMoveItems = useSetAtom(deleteListAndMoveItemsAtom);
 	const canBeClosed = useListCanBeClosed();
+
+	const theme = useTheme();
+	const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
 	const onClick = async () => {
 		setLoading(true);
@@ -54,23 +58,23 @@ export function FinishListButton() {
 				<DialogTitle>Liste enthält noch Ungekauftes</DialogTitle>
 				<Box sx={{ padding: "2rem" }}>
 					<Typography>
-						Nicht alle Gegenstände sind abgehakt. Liste löschen und Gegenstände
-						entfernen?
+						Nicht alle Gegenstände sind abgehakt. Wie sollen wir weitermachen?
 					</Typography>
 					<ButtonGroup
 						variant="contained"
 						sx={{ pt: "1rem" }}
 						color="inherit"
 						disabled={loading}
+						orientation={isMobile ? "vertical" : "horizontal"}
 					>
 						<Button color="primary" onClick={onMoveItemsAndDelete}>
 							Einträge verschieben
 						</Button>
 						<Button color="error" onClick={onConfirmDeletion}>
-							Dennoch löschen
+							Einträge löschen
 						</Button>
 						<Button color="inherit" onClick={() => setShowConfirmation(false)}>
-							Behalten
+							Abbrechen
 						</Button>
 					</ButtonGroup>
 				</Box>

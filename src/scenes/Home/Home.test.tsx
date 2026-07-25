@@ -205,13 +205,13 @@ describe("home page", () => {
 		await userEvent.click(finishListButton);
 
 		expect(await screen.findByRole("dialog")).toBeVisible();
-		const keepButton = screen.getByText("Behalten");
+		const keepButton = screen.getByText("Abbrechen");
 
 		await userEvent.click(keepButton);
 		expect(screen.getByRole("dialog")).not.toBeVisible();
 
 		await userEvent.click(finishListButton);
-		const deleteButton = await screen.findByText("Dennoch löschen");
+		const deleteButton = await screen.findByText("Einträge löschen");
 		await userEvent.click(deleteButton);
 		expect(await screen.findByRole("dialog")).not.toBeVisible();
 		expect(spy).toHaveBeenCalledOnce();
