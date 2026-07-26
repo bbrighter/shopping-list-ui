@@ -5,6 +5,8 @@ import {
 	selectors,
 } from "../../../../store";
 import { itemsAtom } from "../../../../store/items/atoms";
+import type { Item } from "../../../../store/items/types";
+import type { Product } from "../../../../store/products/types";
 
 export const useItemInput = () => {
 	const products = useProductsNotAlreadyUsed();
@@ -15,10 +17,16 @@ export const useItemInput = () => {
 	return { products, items, addItemById, addItemByName };
 };
 
+export const getProductsNotAlreadyInUse = (
+	products: Array<Product>,
+	items: Array<Item>,
+) =>
+	products
+		.filter((p) => !items.some((i) => i.productId === p.id))
+		.sort((a, b) => a.name.localeCompare(b.name));
+
 const useProductsNotAlreadyUsed = () => {
 	const products = useAtomValue(selectors.products.nonArchived);
 	const items = useAtomValue(itemsAtom);
-	return products
-		.filter((p) => !items.some((i) => i.productId === p.id))
-		.sort((a, b) => a.name.localeCompare(b.name));
+	return getProductsNotAlreadyInUse(products, items);
 };

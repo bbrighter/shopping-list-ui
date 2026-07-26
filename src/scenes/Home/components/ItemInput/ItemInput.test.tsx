@@ -81,7 +81,6 @@ describe("Item input for shopping list", () => {
 		const combobox = await screen.findByRole("combobox");
 		await userEvent.click(combobox);
 
-		screen.debug();
 		await userEvent.type(combobox, "prod1");
 		await userEvent.keyboard("{enter}");
 
@@ -89,38 +88,4 @@ describe("Item input for shopping list", () => {
 		expect(addItemById).not.toHaveBeenCalled();
 		expect(addItemByName).not.toHaveBeenCalled();
 	});
-
-	// it("adding an existing item by enter", async () => {
-	// 	server.use(
-	// 		itemHandlers.putItemByName({ id: 3, productId: 2, checked: false }),
-	// 	);
-	// 	render(<ItemInput />);
-
-	// 	const combobox = await screen.findByRole("combobox");
-	// 	await userEvent.type(combobox, "prod2");
-	// 	await userEvent.keyboard("{enter}");
-
-	// 	expect(spyPostItem).not.toHaveBeenCalled();
-	// 	expect(spyPostItemByName).toHaveBeenCalled();
-
-	// 	expect(store.get(itemsAtom)).toHaveLength(2);
-	// 	expect(store.get(productsAtom)).toHaveLength(3);
-	// });
-
-	// it("adding an existing, but archived item", async () => {
-	// 	server.use(
-	// 		itemHandlers.putItemByName({ id: 3, productId: 2, checked: false }),
-	// 	);
-	// 	render(<ItemInput />);
-
-	// 	const combobox = await screen.findByRole("combobox");
-	// 	await userEvent.type(combobox, "archived");
-	// 	await userEvent.keyboard("{enter}");
-
-	// 	expect(spyPostItem).not.toHaveBeenCalled();
-	// 	expect(spyPostItemByName).toHaveBeenCalled();
-
-	// 	expect(store.get(itemsAtom)).toHaveLength(2);
-	// 	expect(store.get(productsAtom)).toHaveLength(3);
-	// });
 });
