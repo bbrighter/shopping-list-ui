@@ -6,37 +6,34 @@ import UnpublishedIcon from "@mui/icons-material/Unpublished";
 import Button from "@mui/material/Button";
 import ListItem from "@mui/material/ListItem";
 import ListItemText from "@mui/material/ListItemText";
-import { useSetAtom } from "jotai";
 import {
 	LeadingActions,
 	SwipeAction,
 	SwipeableListItem,
 	TrailingActions,
 } from "react-swipeable-list";
-
-import {
-	changeItemQuantityAtom,
-	checkItemAtom,
-	deleteItemAtom,
-} from "../../../store";
 import ItemCheckBox from "./ItemCheckBox";
 import ItemSecondaryAction from "./ItemSecondaryAction";
 
-export const ShoppingListItem = ({
-	it,
-}: {
-	it: {
+export type ShoppingListItemProps = {
+	item: {
 		checked: boolean;
 		id: number;
 		quantity?: number | null;
 		productName?: string;
 	};
-}) => {
-	const check = useSetAtom(checkItemAtom);
-	const deleteItem = useSetAtom(deleteItemAtom);
-	const updateItem = useSetAtom(changeItemQuantityAtom);
+	onCheck: (id: number) => Promise<void>;
+	onDelete: (id: number) => Promise<void>;
+	onUpdateQuantity: (id: number, quantity?: number) => Promise<void>;
+};
 
-	const checkButtonIcon = it.checked ? (
+export const ShoppingListItem = ({
+	item,
+	onCheck,
+	onDelete,
+	onUpdateQuantity,
+}: ShoppingListItemProps) => {
+	const checkButtonIcon = item.checked ? (
 		<UnpublishedIcon />
 	) : (
 		<CheckCircleIcon />
@@ -44,7 +41,7 @@ export const ShoppingListItem = ({
 
 	const leadingActions = () => (
 		<LeadingActions>
-			<SwipeAction onClick={() => check(it.id)}>
+			<SwipeAction onClick={() => onCheck(item.id)}>
 				<Button variant="contained" color="info" endIcon={checkButtonIcon} />
 			</SwipeAction>
 		</LeadingActions>
@@ -52,20 +49,20 @@ export const ShoppingListItem = ({
 
 	const trailingActions = () => (
 		<TrailingActions>
-			<SwipeAction onClick={() => deleteItem(it.id)} destructive>
+			<SwipeAction onClick={() => onDelete(item.id)} destructive>
 				<Button variant="contained" color="error" startIcon={<DeleteIcon />} />
 			</SwipeAction>
 		</TrailingActions>
 	);
 
 	const onIncrease = () => {
-		const newQuantity = it.quantity ? it.quantity + 1 : 1;
-		updateItem(it.id, newQuantity);
+		const newQuantity = item.quantity ? item.quantity + 1 : 1;
+		onUpdateQuantity(item.id, newQuantity);
 	};
 	const onDecrease = () => {
 		const newQuantity =
-			!it.quantity || it.quantity === 1 ? undefined : it.quantity - 1;
-		updateItem(it.id, newQuantity);
+			!item.quantity || item.quantity === 1 ? undefined : item.quantity - 1;
+		onUpdateQuantity(item.id, newQuantity);
 	};
 
 	return (
@@ -77,16 +74,16 @@ export const ShoppingListItem = ({
 			<ListItem
 				secondaryAction={
 					<ItemSecondaryAction
-						item={it}
+						item={item}
 						onDecrease={onDecrease}
 						onIncrease={onIncrease}
 					/>
 				}
 			>
-				<ItemCheckBox item={it} />
+				<ItemCheckBox item={item} onCheck={onCheck} />
 				<ListItemText
-					primary={it.productName || "no name"}
-					secondary={it.quantity}
+					primary={item.productName || "no name"}
+					secondary={item.quantity}
 				/>
 			</ListItem>
 		</SwipeableListItem>
